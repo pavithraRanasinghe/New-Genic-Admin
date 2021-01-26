@@ -6,7 +6,7 @@ import lk.robot.newgenicadmin.entity.SubCategoryEntity;
 import lk.robot.newgenicadmin.exception.CustomException;
 import lk.robot.newgenicadmin.repository.ProductRepository;
 import lk.robot.newgenicadmin.repository.SubCategoryRepository;
-import lk.robot.newgenicadmin.service.AdminProductService;
+import lk.robot.newgenicadmin.service.ProductService;
 import lk.robot.newgenicadmin.util.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AdminProductServiceImpl implements AdminProductService {
+public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
     private SubCategoryRepository subCategoryRepository;
 
     @Autowired
-    public AdminProductServiceImpl(ProductRepository productRepository,
-                                   SubCategoryRepository subCategoryRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              SubCategoryRepository subCategoryRepository) {
         this.productRepository = productRepository;
         this.subCategoryRepository = subCategoryRepository;
     }

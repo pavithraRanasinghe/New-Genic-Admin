@@ -1,7 +1,6 @@
 package lk.robot.newgenicadmin.controller;
 
 import lk.robot.newgenicadmin.dto.request.CategoryRequestDTO;
-import lk.robot.newgenicadmin.service.AdminCategoryService;
 import lk.robot.newgenicadmin.service.CategoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +12,13 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/category")
-public class AdminCategoryController {
+public class CategoryController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminCategoryController.class);
-    private AdminCategoryService categoryService;
-    private CategoryService userCategoryService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CategoryController.class);
+    private CategoryService categoryService;
 
     @Autowired
-    public AdminCategoryController(AdminCategoryService categoryService) {
+    public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
@@ -36,7 +34,7 @@ public class AdminCategoryController {
     @GetMapping("/get")
     public ResponseEntity<?> getCategories(Principal principal){
         LOGGER.info("request - admin | getCategory | adminId: {}",principal.getName());
-        ResponseEntity<?> all = userCategoryService.getAll();
+        ResponseEntity<?> all = categoryService.getCategory();
         LOGGER.info("response - admin | getCategory | categories: {}",all.getStatusCode());
         return all;
     }

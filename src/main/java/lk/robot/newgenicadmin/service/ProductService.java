@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface AdminProductService {
+public interface ProductService {
 
     ResponseEntity<?> addProduct(List<ProductRequestDTO> productRequestList);
 }

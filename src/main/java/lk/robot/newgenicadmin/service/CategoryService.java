@@ -1,12 +1,11 @@
 package lk.robot.newgenicadmin.service;
 
+import lk.robot.newgenicadmin.dto.request.CategoryRequestDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface CategoryService {
 
-    ResponseEntity<?> getAll();
+    ResponseEntity<?> addCategory(CategoryRequestDTO categoryRequestDTO,long adminId);
 
-    ResponseEntity<?> getMainSubCategoryProducts(long mainSubCategoryId,int index,int size);
-
-    ResponseEntity<?> getSubCategoryProducts(long subCategoryId,int index,int size);
+    ResponseEntity<?> getCategory();
 }

@@ -10,7 +10,7 @@ import lk.robot.newgenicadmin.exception.CustomException;
 import lk.robot.newgenicadmin.repository.AdminRepository;
 import lk.robot.newgenicadmin.repository.DeliveryCostRepository;
 import lk.robot.newgenicadmin.repository.DeliveryRepository;
-import lk.robot.newgenicadmin.service.AdminDeliveryService;
+import lk.robot.newgenicadmin.service.DeliveryService;
 import lk.robot.newgenicadmin.util.DateConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AdminDeliveryServiceImpl implements AdminDeliveryService {
+public class DeliveryServiceImpl implements DeliveryService {
 
     private final ModelMapper modelMapper;
     private AdminRepository adminRepository;
@@ -35,10 +35,10 @@ public class AdminDeliveryServiceImpl implements AdminDeliveryService {
     private DeliveryRepository deliveryRepository;
 
     @Autowired
-    public AdminDeliveryServiceImpl(AdminRepository adminRepository,
-                                    ModelMapper modelMapper,
-                                    DeliveryCostRepository deliveryCostRepository,
-                                    DeliveryRepository deliveryRepository) {
+    public DeliveryServiceImpl(AdminRepository adminRepository,
+                               ModelMapper modelMapper,
+                               DeliveryCostRepository deliveryCostRepository,
+                               DeliveryRepository deliveryRepository) {
         this.adminRepository = adminRepository;
         this.modelMapper = modelMapper;
         this.deliveryCostRepository = deliveryCostRepository;

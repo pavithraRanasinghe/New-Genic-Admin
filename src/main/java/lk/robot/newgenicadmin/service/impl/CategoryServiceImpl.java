@@ -14,7 +14,7 @@ import lk.robot.newgenicadmin.repository.AdminRepository;
 import lk.robot.newgenicadmin.repository.MainCategoryRepository;
 import lk.robot.newgenicadmin.repository.MainSubCategoryRepository;
 import lk.robot.newgenicadmin.repository.SubCategoryRepository;
-import lk.robot.newgenicadmin.service.AdminCategoryService;
+import lk.robot.newgenicadmin.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AdminCategoryServiceImpl implements AdminCategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
     private MainCategoryRepository mainCategoryRepository;
     private AdminRepository adminRepository;
@@ -33,10 +33,10 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     private SubCategoryRepository subCategoryRepository;
 
     @Autowired
-    public AdminCategoryServiceImpl(MainCategoryRepository mainCategoryRepository,
-                                    AdminRepository adminRepository,
-                                    MainSubCategoryRepository mainSubCategoryRepository,
-                                    SubCategoryRepository subCategoryRepository) {
+    public CategoryServiceImpl(MainCategoryRepository mainCategoryRepository,
+                               AdminRepository adminRepository,
+                               MainSubCategoryRepository mainSubCategoryRepository,
+                               SubCategoryRepository subCategoryRepository) {
         this.mainCategoryRepository = mainCategoryRepository;
         this.adminRepository = adminRepository;
         this.mainSubCategoryRepository = mainSubCategoryRepository;
