@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -35,9 +36,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<?> getAllOrders() {
+    public ResponseEntity<?> getOrders(String type) {
         try{
-            List<OrderEntity> orderList = orderRepository.findByStatus(OrderStatus.PENDING.toString());
+
+            String uuid = UUID.randomUUID().toString();
+
+            String orderType = checkOrderType(type);
+            if (orderType.equals(null)){
+                return new ResponseEntity<>("Invalid order type",HttpStatus.BAD_REQUEST);
+            }
+            List<OrderEntity> orderList = orderRepository.findByStatus(orderType);
             if (!orderList.isEmpty()){
                 List<OrderResponseDTO> responseList = new ArrayList<>();
                 for (OrderEntity orderEntity :
@@ -96,5 +104,21 @@ public class OrderServiceImpl implements OrderService {
         orderResponseDTO.setOrderProductDTOList(productDTOList);
 
         return orderResponseDTO;
+    }
+
+    private String checkOrderType(String type){
+        switch (type){
+            case "PENDING":
+                return "PENDING";
+            case "DELIVERED":
+                return "DELIVERED";
+            case "SHIPPED":
+                return "SHIPPED";
+            case "CANCELLED":
+                return "CANCELLED";
+            case "DELIVER_FAILED":
+                return "DELIVER_FAILED";
+        }
+        return null;
     }
 }

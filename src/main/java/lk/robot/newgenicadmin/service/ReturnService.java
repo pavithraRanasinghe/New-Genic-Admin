@@ -2,9 +2,7 @@ package lk.robot.newgenicadmin.service;
 
 import org.springframework.http.ResponseEntity;
 
-public interface OrderService {
+public interface ReturnService {
 
-    ResponseEntity<?> getOrders(String type);
-
-
+    ResponseEntity<?> getReturnRequest();
 }

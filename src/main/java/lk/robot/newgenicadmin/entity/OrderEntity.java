@@ -12,7 +12,6 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private long orderId;
-    @Column
     private String status;
     @Column(name = "pick_up_date")
     private Date pickUpDate;
@@ -26,24 +25,25 @@ public class OrderEntity {
     private double totalWeight;
     @Column(name = "tracking_number")
     private String trackingNumber;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_user_id")
     private UserEntity userEntity;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_delivery_id")
     private DeliveryEntity deliveryEntity;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id",referencedColumnName = "payment_id")
     private PaymentEntity paymentEntity;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_shipping_detail_id")
     private UserAddressEntity shippingDetails;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_billing_detail_id")
     private UserAddressEntity billingDetail;
-    @ManyToOne
-    @JoinColumn(name = "fk_discount_method_id")
-    private DiscountMethodEntity discountMethodEntity;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "return_request_id",referencedColumnName = "return_request_id")
+    private ReturnEntity returnEntity;
+
 
     public OrderEntity() {
     }
@@ -61,7 +61,7 @@ public class OrderEntity {
                        PaymentEntity paymentEntity,
                        UserAddressEntity shippingDetails,
                        UserAddressEntity billingDetail,
-                       DiscountMethodEntity discountMethodEntity) {
+                       ReturnEntity returnEntity) {
         this.orderId = orderId;
         this.status = status;
         this.pickUpDate = pickUpDate;
@@ -75,7 +75,7 @@ public class OrderEntity {
         this.paymentEntity = paymentEntity;
         this.billingDetail = billingDetail;
         this.shippingDetails = shippingDetails;
-        this.discountMethodEntity = discountMethodEntity;
+        this.returnEntity = returnEntity;
     }
 
     public long getOrderId() {
@@ -182,12 +182,12 @@ public class OrderEntity {
         this.billingDetail = billingDetail;
     }
 
-    public DiscountMethodEntity getDiscountMethodEntity() {
-        return discountMethodEntity;
+    public ReturnEntity getReturnEntity() {
+        return returnEntity;
     }
 
-    public void setDiscountMethodEntity(DiscountMethodEntity discountMethodEntity) {
-        this.discountMethodEntity = discountMethodEntity;
+    public void setReturnEntity(ReturnEntity returnEntity) {
+        this.returnEntity = returnEntity;
     }
 
     @Override
@@ -206,7 +206,7 @@ public class OrderEntity {
                 ", paymentEntity=" + paymentEntity +
                 ", shippingDetails=" + shippingDetails +
                 ", billingDetail=" + billingDetail +
-                ", discountMethodEntity=" + discountMethodEntity +
+                ", returnEntity=" + returnEntity +
                 '}';
     }
 }

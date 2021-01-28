@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,11 +24,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllOrders(Principal principal){
-        LOGGER.info("request | getAllOrders | adminId: {}",principal.getName());
-        ResponseEntity<?> allOrders = orderService.getAllOrders();
-        LOGGER.info("response | getAllOrders | allOrders: {}",allOrders.getStatusCode());
+    @GetMapping("/{type}")
+    public ResponseEntity<?> getOrders(@PathVariable String type, Principal principal) {
+        LOGGER.info("request | getAllOrders | type: {} | adminId: {}", type, principal.getName());
+        ResponseEntity<?> allOrders = orderService.getOrders(type);
+        LOGGER.info("response | getAllOrders | allOrders: {}", allOrders.getStatusCode());
         return allOrders;
     }
 }
