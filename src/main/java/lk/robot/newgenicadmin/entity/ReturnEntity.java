@@ -16,6 +16,10 @@ public class ReturnEntity {
     private Date requestDate;
     @Column(name = "request_time")
     private Time requestTime;
+    @Column(name = "response_date")
+    private Date responseDate;
+    @Column(name = "response_time")
+    private Time responseTime;
     @Column
     private String action;
     @OneToOne(mappedBy = "returnEntity",cascade = CascadeType.ALL,orphanRemoval = true)
@@ -27,11 +31,15 @@ public class ReturnEntity {
     public ReturnEntity(long returnRequestId,
                         Date requestDate,
                         Time requestTime,
+                        Date responseDate,
+                        Time responseTime,
                         String action,
                         OrderEntity orderEntity) {
         this.returnRequestId = returnRequestId;
         this.requestDate = requestDate;
         this.requestTime = requestTime;
+        this.responseDate = responseDate;
+        this.responseTime = responseTime;
         this.orderEntity = orderEntity;
         this.action = action;
         this.orderEntity = orderEntity;
@@ -61,6 +69,22 @@ public class ReturnEntity {
         this.requestTime = requestTime;
     }
 
+    public Date getResponseDate() {
+        return responseDate;
+    }
+
+    public void setResponseDate(Date responseDate) {
+        this.responseDate = responseDate;
+    }
+
+    public Time getResponseTime() {
+        return responseTime;
+    }
+
+    public void setResponseTime(Time responseTime) {
+        this.responseTime = responseTime;
+    }
+
     public String getAction() {
         return action;
     }
@@ -84,6 +108,8 @@ public class ReturnEntity {
                 "returnRequestId=" + returnRequestId +
                 ", requestDate=" + requestDate +
                 ", requestTime=" + requestTime +
+                ", responseDate=" + responseDate +
+                ", responseTime=" + responseTime +
                 ", action='" + action + '\'' +
                 ", orderEntity=" + orderEntity +
                 '}';

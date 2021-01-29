@@ -1,7 +1,10 @@
 package lk.robot.newgenicadmin.dto.response;
 
+import lk.robot.newgenicadmin.dto.DeliveryCostDTO;
+
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
 
 public class DeliveryResponseDTO {
 
@@ -15,7 +18,7 @@ public class DeliveryResponseDTO {
     private Time registrationTime;
     private String registrationNumber;
     private boolean active;
-    private DeliveryCostDTO deliveryCostDTO;
+    private List<DeliveryCostDTO> deliveryCostDTOList;
 
     public DeliveryResponseDTO() {
     }
@@ -30,7 +33,7 @@ public class DeliveryResponseDTO {
                                Time registrationTime,
                                String registrationNumber,
                                boolean active,
-                               DeliveryCostDTO deliveryCostDTO) {
+                               List<DeliveryCostDTO> deliveryCostDTOList) {
         this.deliveryId = deliveryId;
         this.name = name;
         this.address = address;
@@ -41,7 +44,7 @@ public class DeliveryResponseDTO {
         this.registrationTime = registrationTime;
         this.registrationNumber = registrationNumber;
         this.active = active;
-        this.deliveryCostDTO = deliveryCostDTO;
+        this.deliveryCostDTOList = deliveryCostDTOList;
     }
 
     public long getDeliveryId() {
@@ -124,12 +127,12 @@ public class DeliveryResponseDTO {
         this.active = active;
     }
 
-    public DeliveryCostDTO getDeliveryCostDTO() {
-        return deliveryCostDTO;
+    public List<DeliveryCostDTO> getDeliveryCostDTOList() {
+        return deliveryCostDTOList;
     }
 
-    public void setDeliveryCostDTO(DeliveryCostDTO deliveryCostDTO) {
-        this.deliveryCostDTO = deliveryCostDTO;
+    public void setDeliveryCostDTOList(List<DeliveryCostDTO> deliveryCostDTOList) {
+        this.deliveryCostDTOList = deliveryCostDTOList;
     }
 
     @Override
@@ -145,7 +148,7 @@ public class DeliveryResponseDTO {
                 ", registrationTime=" + registrationTime +
                 ", registrationNumber='" + registrationNumber + '\'' +
                 ", active=" + active +
-                ", deliveryCostDTO=" + deliveryCostDTO +
+                ", deliveryCostDTOList=" + deliveryCostDTOList +
                 '}';
     }
 }

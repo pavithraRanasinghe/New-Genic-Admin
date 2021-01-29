@@ -1,7 +1,7 @@
 package lk.robot.newgenicadmin.service.impl;
 
+import lk.robot.newgenicadmin.dto.DeliveryCostDTO;
 import lk.robot.newgenicadmin.dto.request.DeliveryRequestDTO;
-import lk.robot.newgenicadmin.dto.response.DeliveryCostDTO;
 import lk.robot.newgenicadmin.dto.response.DeliveryResponseDTO;
 import lk.robot.newgenicadmin.entity.AdminEntity;
 import lk.robot.newgenicadmin.entity.DeliveryCostEntity;
@@ -50,25 +50,19 @@ public class DeliveryServiceImpl implements DeliveryService {
         try{
             Optional<AdminEntity> adminEntity = adminRepository.findById(adminId);
             if (deliveryRequestDTO != null){
-                if (deliveryRequestDTO.getDeliveryCostDTO().getDeliveryCostId() == 0){
-                    DeliveryCostEntity deliveryCostEntity = modelMapper.map(deliveryRequestDTO.getDeliveryCostDTO(), DeliveryCostEntity.class);
-                    DeliveryCostEntity deliveryCost = deliveryCostRepository.save(deliveryCostEntity);
-                    if (deliveryCost != null){
-                        DeliveryEntity deliveryEntity = deliveryDtoToEntity(deliveryRequestDTO, adminEntity.get(), deliveryCost);
-                        deliveryRepository.save(deliveryEntity);
-                        return new ResponseEntity<>("Delivery added to successful",HttpStatus.OK);
-                    }else {
-                        return new ResponseEntity<>("Delivery details & Delivery Cost not saved", HttpStatus.BAD_REQUEST);
+                DeliveryEntity deliveryEntity = deliveryDtoToEntity(deliveryRequestDTO, adminEntity.get());
+                DeliveryEntity delivery = deliveryRepository.save(deliveryEntity);
+                if (!delivery.equals(null)){
+                    for (DeliveryCostDTO deliveryCostDTO :
+                            deliveryRequestDTO.getDeliveryCostDTOList()) {
+                        DeliveryCostEntity costEntity = modelMapper.map(deliveryCostDTO, DeliveryCostEntity.class);
+                        costEntity.setDeliveryEntity(delivery);
+
+                        deliveryCostRepository.save(costEntity);
                     }
+                    return new ResponseEntity<>("Deliver added successful",HttpStatus.OK);
                 }else {
-                    Optional<DeliveryCostEntity> deliveryCost = deliveryCostRepository.findById(deliveryRequestDTO.getDeliveryCostDTO().getDeliveryCostId());
-                    if (deliveryCost.isPresent()){
-                        DeliveryEntity deliveryEntity = deliveryDtoToEntity(deliveryRequestDTO, adminEntity.get(), deliveryCost.get());
-                        deliveryRepository.save(deliveryEntity);
-                        return new ResponseEntity<>("Delivery added to successful",HttpStatus.OK);
-                    }else {
-                        return new ResponseEntity<>("Delivery details & Delivery Cost not saved", HttpStatus.BAD_REQUEST);
-                    }
+                    return new ResponseEntity<>("Delivery added not complete",HttpStatus.BAD_REQUEST);
                 }
             }else {
                 return new ResponseEntity<>("Delivery details not found", HttpStatus.BAD_REQUEST);
@@ -87,7 +81,13 @@ public class DeliveryServiceImpl implements DeliveryService {
                 for (DeliveryEntity deliveryEntity :
                         all) {
                     DeliveryResponseDTO deliveryResponse = modelMapper.map(deliveryEntity, DeliveryResponseDTO.class);
-                    deliveryResponse.setDeliveryCostDTO(modelMapper.map(deliveryEntity.getDeliveryCostEntity(), DeliveryCostDTO.class));
+                    List<DeliveryCostEntity> byDeliveryEntity = deliveryCostRepository.findByDeliveryEntity(deliveryEntity);
+                    List<DeliveryCostDTO> costList = new ArrayList<>();
+                    for (DeliveryCostEntity deliveryCostEntity :
+                            byDeliveryEntity) {
+                        costList.add(modelMapper.map(deliveryCostEntity, DeliveryCostDTO.class));
+                    }
+                    deliveryResponse.setDeliveryCostDTOList(costList);
                     responseDTO.add(deliveryResponse);
                 }
                 return new ResponseEntity<>(responseDTO,HttpStatus.OK);
@@ -99,7 +99,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         }
     }
 
-    private DeliveryEntity deliveryDtoToEntity(DeliveryRequestDTO deliveryRequestDTO,AdminEntity adminEntity,DeliveryCostEntity deliveryCost){
+    private DeliveryEntity deliveryDtoToEntity(DeliveryRequestDTO deliveryRequestDTO, AdminEntity adminEntity){
         DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setName(deliveryRequestDTO.getName());
         deliveryEntity.setAddress(deliveryRequestDTO.getAddress());
@@ -110,8 +110,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         deliveryEntity.setRegistrationDate(DateConverter.localDateToSql(LocalDate.now()));
         deliveryEntity.setRegistrationTime(DateConverter.localTimeToSql(LocalTime.now()));
         deliveryEntity.setAdminEntity(adminEntity);
-        deliveryEntity.setDeliveryCostEntity(deliveryCost);
-
         return deliveryEntity;
     }
 }

@@ -1,7 +1,9 @@
 package lk.robot.newgenicadmin.dto.request;
 
 
-import lk.robot.newgenicadmin.dto.response.DeliveryCostDTO;
+import lk.robot.newgenicadmin.dto.DeliveryCostDTO;
+
+import java.util.List;
 
 public class DeliveryRequestDTO {
 
@@ -11,7 +13,7 @@ public class DeliveryRequestDTO {
     private String mobile;
     private String webSite;
     private String regNo;
-    private DeliveryCostDTO deliveryCostDTO;
+    private List<DeliveryCostDTO> deliveryCostDTOList;
 
     public DeliveryRequestDTO() {
     }
@@ -22,14 +24,14 @@ public class DeliveryRequestDTO {
                               String mobile,
                               String webSite,
                               String regNo,
-                              DeliveryCostDTO deliveryCostDTO) {
+                              List<DeliveryCostDTO> deliveryCostDTOList) {
         this.name = name;
         this.address = address;
         this.gmail = gmail;
         this.mobile = mobile;
         this.webSite = webSite;
         this.regNo = regNo;
-        this.deliveryCostDTO = deliveryCostDTO;
+        this.deliveryCostDTOList = deliveryCostDTOList;
     }
 
     public String getName() {
@@ -80,12 +82,12 @@ public class DeliveryRequestDTO {
         this.regNo = regNo;
     }
 
-    public DeliveryCostDTO getDeliveryCostDTO() {
-        return deliveryCostDTO;
+    public List<DeliveryCostDTO> getDeliveryCostDTOList() {
+        return deliveryCostDTOList;
     }
 
-    public void setDeliveryCostDTO(DeliveryCostDTO deliveryCostDTO) {
-        this.deliveryCostDTO = deliveryCostDTO;
+    public void setDeliveryCostDTOList(List<DeliveryCostDTO> deliveryCostDTOList) {
+        this.deliveryCostDTOList = deliveryCostDTOList;
     }
 
     @Override
@@ -97,7 +99,7 @@ public class DeliveryRequestDTO {
                 ", mobile='" + mobile + '\'' +
                 ", webSite='" + webSite + '\'' +
                 ", regNo='" + regNo + '\'' +
-                ", deliveryCostDTO=" + deliveryCostDTO +
+                ", deliveryCostDTOList=" + deliveryCostDTOList +
                 '}';
     }
 }

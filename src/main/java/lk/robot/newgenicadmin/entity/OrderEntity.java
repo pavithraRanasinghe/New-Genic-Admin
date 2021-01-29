@@ -40,10 +40,12 @@ public class OrderEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_billing_detail_id")
     private UserAddressEntity billingDetail;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_discount_method_id")
+    private DiscountMethodEntity discountMethodEntity;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "return_request_id",referencedColumnName = "return_request_id")
     private ReturnEntity returnEntity;
-
 
     public OrderEntity() {
     }
@@ -61,6 +63,7 @@ public class OrderEntity {
                        PaymentEntity paymentEntity,
                        UserAddressEntity shippingDetails,
                        UserAddressEntity billingDetail,
+                       DiscountMethodEntity discountMethodEntity,
                        ReturnEntity returnEntity) {
         this.orderId = orderId;
         this.status = status;
@@ -75,6 +78,7 @@ public class OrderEntity {
         this.paymentEntity = paymentEntity;
         this.billingDetail = billingDetail;
         this.shippingDetails = shippingDetails;
+        this.discountMethodEntity = discountMethodEntity;
         this.returnEntity = returnEntity;
     }
 
@@ -182,6 +186,14 @@ public class OrderEntity {
         this.billingDetail = billingDetail;
     }
 
+    public DiscountMethodEntity getDiscountMethodEntity() {
+        return discountMethodEntity;
+    }
+
+    public void setDiscountMethodEntity(DiscountMethodEntity discountMethodEntity) {
+        this.discountMethodEntity = discountMethodEntity;
+    }
+
     public ReturnEntity getReturnEntity() {
         return returnEntity;
     }
@@ -206,6 +218,7 @@ public class OrderEntity {
                 ", paymentEntity=" + paymentEntity +
                 ", shippingDetails=" + shippingDetails +
                 ", billingDetail=" + billingDetail +
+                ", discountMethodEntity=" + discountMethodEntity +
                 ", returnEntity=" + returnEntity +
                 '}';
     }

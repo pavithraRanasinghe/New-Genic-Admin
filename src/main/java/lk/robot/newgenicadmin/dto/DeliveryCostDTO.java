@@ -1,38 +1,23 @@
-package lk.robot.newgenicadmin.entity;
+package lk.robot.newgenicadmin.dto;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "delivery_cost")
-public class DeliveryCostEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "delivery_cost_id")
+public class DeliveryCostDTO {
     private long deliveryCostId;
     private String district;
     private double cost;
-    @Column(name = "cost_per_extra")
     private double costPerExtra;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_delivery_id")
-    private DeliveryEntity deliveryEntity;
 
-    public DeliveryCostEntity() {
+    public DeliveryCostDTO() {
     }
 
-    public DeliveryCostEntity(long deliveryCostId,
-                              String district,
-                              double cost,
-                              double costPerExtra,
-                              DeliveryEntity deliveryEntity) {
+    public DeliveryCostDTO(long deliveryCostId,
+                           String district,
+                           double cost,
+                           double costPerExtra) {
         this.deliveryCostId = deliveryCostId;
         this.district = district;
         this.cost = cost;
         this.costPerExtra = costPerExtra;
-        this.deliveryEntity = deliveryEntity;
     }
-
 
     public long getDeliveryCostId() {
         return deliveryCostId;
@@ -66,22 +51,13 @@ public class DeliveryCostEntity {
         this.costPerExtra = costPerExtra;
     }
 
-    public DeliveryEntity getDeliveryEntity() {
-        return deliveryEntity;
-    }
-
-    public void setDeliveryEntity(DeliveryEntity deliveryEntity) {
-        this.deliveryEntity = deliveryEntity;
-    }
-
     @Override
     public String toString() {
-        return "DeliveryCostEntity{" +
+        return "DeliveryCostDTO{" +
                 "deliveryCostId=" + deliveryCostId +
                 ", district='" + district + '\'' +
                 ", cost=" + cost +
                 ", costPerExtra=" + costPerExtra +
-                ", deliveryEntity=" + deliveryEntity +
                 '}';
     }
 }

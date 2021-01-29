@@ -30,9 +30,6 @@ public class DeliveryEntity {
     private String registrationNumber;
     @Column
     private boolean active;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "delivery_cost_id",referencedColumnName = "delivery_cost_id")
-    private DeliveryCostEntity deliveryCostEntity;
     @ManyToOne
     @JoinColumn(name = "fk_admin_id")
     private AdminEntity adminEntity;
@@ -50,7 +47,6 @@ public class DeliveryEntity {
                           Time registrationTime,
                           String registrationNumber,
                           boolean active,
-                          DeliveryCostEntity deliveryCostEntity,
                           AdminEntity adminEntity) {
         this.deliveryId = deliveryId;
         this.name = name;
@@ -62,7 +58,6 @@ public class DeliveryEntity {
         this.registrationTime = registrationTime;
         this.registrationNumber = registrationNumber;
         this.active = active;
-        this.deliveryCostEntity = deliveryCostEntity;
         this.adminEntity = adminEntity;
     }
 
@@ -146,14 +141,6 @@ public class DeliveryEntity {
         this.active = active;
     }
 
-    public DeliveryCostEntity getDeliveryCostEntity() {
-        return deliveryCostEntity;
-    }
-
-    public void setDeliveryCostEntity(DeliveryCostEntity deliveryCostEntity) {
-        this.deliveryCostEntity = deliveryCostEntity;
-    }
-
     public AdminEntity getAdminEntity() {
         return adminEntity;
     }
@@ -175,7 +162,6 @@ public class DeliveryEntity {
                 ", registrationTime=" + registrationTime +
                 ", registrationNumber='" + registrationNumber + '\'' +
                 ", active=" + active +
-                ", deliveryCostEntity=" + deliveryCostEntity +
                 ", adminEntity=" + adminEntity +
                 '}';
     }

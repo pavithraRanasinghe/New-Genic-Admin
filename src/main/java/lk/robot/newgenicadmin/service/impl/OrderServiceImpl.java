@@ -4,7 +4,6 @@ import lk.robot.newgenicadmin.dto.*;
 import lk.robot.newgenicadmin.dto.response.OrderResponseDTO;
 import lk.robot.newgenicadmin.entity.OrderDetailEntity;
 import lk.robot.newgenicadmin.entity.OrderEntity;
-import lk.robot.newgenicadmin.enums.OrderStatus;
 import lk.robot.newgenicadmin.exception.CustomException;
 import lk.robot.newgenicadmin.repository.OrderDetailRepository;
 import lk.robot.newgenicadmin.repository.OrderRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -38,9 +36,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResponseEntity<?> getOrders(String type) {
         try{
-
-            String uuid = UUID.randomUUID().toString();
-
             String orderType = checkOrderType(type);
             if (orderType.equals(null)){
                 return new ResponseEntity<>("Invalid order type",HttpStatus.BAD_REQUEST);
