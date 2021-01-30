@@ -70,9 +70,9 @@ public class ReturnServiceImpl implements ReturnService {
                             returnDetails) {
                         returnDetailList.add(setProductDetail(returnDetailEntity));
                     }
-                    returnResponseList.add(setReturnDetails(returnEntity,returnDetailList));
+                    returnResponseList.add(setReturnDetails(returnEntity, returnDetailList));
                 }
-                return new ResponseEntity<>(returnResponseList,HttpStatus.OK);
+                return new ResponseEntity<>(returnResponseList, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("No return request", HttpStatus.BAD_REQUEST);
             }
@@ -83,11 +83,11 @@ public class ReturnServiceImpl implements ReturnService {
 
     @Override
     public ResponseEntity<?> refundReturn(long orderId) {
-        try{
+        try {
             Optional<OrderEntity> orderEntity = orderRepository.findById(orderId);
-            if (orderEntity.isPresent()){
+            if (orderEntity.isPresent()) {
                 ReturnEntity returnEntity = returnRepository.findByOrderEntity(orderEntity.get());
-                if (!returnEntity.equals(null)){
+                if (!returnEntity.equals(null)) {
                     PaymentEntity paymentEntity = returnEntity.getOrderEntity().getPaymentEntity();
                     double refund = calculateRefund(paymentEntity);
                     paymentEntity.setRefund(refund);
@@ -98,51 +98,54 @@ public class ReturnServiceImpl implements ReturnService {
                     returnEntity.setResponseTime(DateConverter.localTimeToSql(LocalTime.now()));
 
                     returnRepository.save(returnEntity);
-                    return new ResponseEntity<>("Refund successful",HttpStatus.OK);
+                    return new ResponseEntity<>("Refund successful", HttpStatus.OK);
 
-                }else {
-                    return new ResponseEntity<>("No return found",HttpStatus.BAD_REQUEST);
+                } else {
+                    return new ResponseEntity<>("No return found", HttpStatus.BAD_REQUEST);
                 }
-            }else {
-                return new ResponseEntity<>("Order not found",HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Order not found", HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
 
     @Override
     public ResponseEntity<?> reorderReturn(ReorderRequest reorderRequest) {
-        try{
+        try {
             Optional<OrderEntity> orderEntity = orderRepository.findById(reorderRequest.getOrderId());
-            if (orderEntity.isPresent()){
+            if (orderEntity.isPresent()) {
                 ReturnEntity returnEntity = returnRepository.findByOrderEntity(orderEntity.get());
-                if (!returnEntity.equals(null)){
+                if (!returnEntity.equals(null)) {
                     List<ReturnDetailEntity> returnDetails = returnDetailRepository.findByReturnEntity(returnEntity);
-                    OrderEntity newOrder = setNewOrder(orderEntity.get(), reorderRequest.getTrackingNumber(), calculateWeightAndPrice(returnDetails, orderEntity.get()));
-                    if (!newOrder.equals(null)){
+                    OrderEntity newOrder = setNewOrder(orderEntity.get(),
+                            reorderRequest.getTrackingNumber(),
+                            calculateWeightAndPrice(returnDetails, orderEntity.get()));
+
+                    if (!newOrder.equals(null)) {
                         for (ReturnDetailEntity returnDetailEntity :
                                 returnDetails) {
                             OrderDetailEntity orderDetailEntity = setNewOrderDetail(returnDetailEntity, newOrder);
                             orderDetailRepository.save(orderDetailEntity);
                         }
-                        return new ResponseEntity<>("ReOrder successful",HttpStatus.OK);
-                    }else{
-                        return new ResponseEntity<>("Order not completed",HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<>("ReOrder successful", HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("Order not completed", HttpStatus.BAD_REQUEST);
                     }
-                }else {
-                    return new ResponseEntity<>("No return found",HttpStatus.BAD_REQUEST);
+                } else {
+                    return new ResponseEntity<>("No return found", HttpStatus.BAD_REQUEST);
                 }
-            }else {
-                return new ResponseEntity<>("Order not found",HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Order not found", HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
 
 
-    private ReturnResponseDTO setReturnDetails(ReturnEntity returnEntity,List<ReturnDetailDTO> returnDetailList) {
+    private ReturnResponseDTO setReturnDetails(ReturnEntity returnEntity, List<ReturnDetailDTO> returnDetailList) {
         return new ReturnResponseDTO(
                 returnEntity.getOrderEntity().getOrderId(),
                 returnEntity.getOrderEntity().getOrderDate(),
@@ -157,15 +160,15 @@ public class ReturnServiceImpl implements ReturnService {
         return new ReturnDetailDTO(
                 returnDetail.getReason(),
                 returnDetail.getReturnQty(),
-                modelMapper.map(returnDetail.getOrderDetailEntity().getProductEntity(),ProductDTO.class)
+                modelMapper.map(returnDetail.getOrderDetailEntity().getProductEntity(), ProductDTO.class)
         );
     }
 
-    private double calculateRefund(PaymentEntity paymentEntity){
+    private double calculateRefund(PaymentEntity paymentEntity) {
         return paymentEntity.getOrderPrice() + paymentEntity.getDeliveryPrice();
     }
 
-    private OrderEntity setNewOrder(OrderEntity orderDetail,String trackingNumber,ReorderPriceWeightDTO reorderPriceWeightDTO){
+    private OrderEntity setNewOrder(OrderEntity orderDetail, String trackingNumber, ReorderPriceWeightDTO reorderPriceWeightDTO) {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setStatus(OrderStatus.SHIPPED.toString());
         orderEntity.setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
@@ -183,7 +186,7 @@ public class ReturnServiceImpl implements ReturnService {
         return orderEntity;
     }
 
-    private OrderDetailEntity setNewOrderDetail(ReturnDetailEntity returnDetailEntity,OrderEntity orderEntity){
+    private OrderDetailEntity setNewOrderDetail(ReturnDetailEntity returnDetailEntity, OrderEntity orderEntity) {
         OrderDetailEntity orderDetailEntity = new OrderDetailEntity();
         orderDetailEntity.setQuantity(returnDetailEntity.getReturnQty());
         orderDetailEntity.setOrderPrice(returnDetailEntity.getOrderDetailEntity().getProductEntity().getRetailPrice() * returnDetailEntity.getReturnQty());
@@ -192,7 +195,7 @@ public class ReturnServiceImpl implements ReturnService {
         return orderDetailEntity;
     }
 
-    private PaymentEntity setPayment(ReorderPriceWeightDTO reorderPriceWeightDTO){
+    private PaymentEntity setPayment(ReorderPriceWeightDTO reorderPriceWeightDTO) {
         PaymentEntity paymentEntity = new PaymentEntity();
         paymentEntity.setRefund(reorderPriceWeightDTO.getTotalPrice() + reorderPriceWeightDTO.getTotalPrice());
         paymentEntity.setPaymentDate(DateConverter.localDateToSql(LocalDate.now()));
@@ -201,7 +204,7 @@ public class ReturnServiceImpl implements ReturnService {
         return paymentEntity;
     }
 
-    private ReorderPriceWeightDTO calculateWeightAndPrice(List<ReturnDetailEntity> returnDetails,OrderEntity orderEntity){
+    private ReorderPriceWeightDTO calculateWeightAndPrice(List<ReturnDetailEntity> returnDetails, OrderEntity orderEntity) {
         String district = orderEntity.getShippingDetails().getDistrict();
         double totalWeight = 0;
         double totalPrice = 0;
@@ -214,13 +217,13 @@ public class ReturnServiceImpl implements ReturnService {
 
         DeliveryCostEntity districtPrice = deliveryCostRepository.findByDistrictAndDeliveryEntity(district, orderEntity.getDeliveryEntity());
 
-        if (totalWeight != 0){
+        if (totalWeight != 0) {
             deliveryPrice = districtPrice.getCost();
         }
-        if (totalWeight > 1000){
+        if (totalWeight > 1000) {
             int round = (int) Math.ceil(totalWeight / 1000);
             deliveryPrice += (districtPrice.getCostPerExtra() * round);
         }
-        return new ReorderPriceWeightDTO(totalWeight,totalPrice,deliveryPrice);
+        return new ReorderPriceWeightDTO(totalWeight, totalPrice, deliveryPrice);
     }
 }

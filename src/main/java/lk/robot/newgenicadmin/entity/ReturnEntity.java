@@ -40,7 +40,6 @@ public class ReturnEntity {
         this.requestTime = requestTime;
         this.responseDate = responseDate;
         this.responseTime = responseTime;
-        this.orderEntity = orderEntity;
         this.action = action;
         this.orderEntity = orderEntity;
     }

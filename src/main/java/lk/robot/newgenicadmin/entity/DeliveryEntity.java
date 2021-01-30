@@ -3,6 +3,7 @@ package lk.robot.newgenicadmin.entity;
 import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
 
 @Entity
 @Table(name = "delivery")
@@ -33,6 +34,8 @@ public class DeliveryEntity {
     @ManyToOne
     @JoinColumn(name = "fk_admin_id")
     private AdminEntity adminEntity;
+    @OneToMany(mappedBy = "deliveryEntity",fetch = FetchType.LAZY)
+    private List<DeliveryCostEntity> costEntityList;
 
     public DeliveryEntity() {
     }
@@ -149,6 +152,14 @@ public class DeliveryEntity {
         this.adminEntity = adminEntity;
     }
 
+    public List<DeliveryCostEntity> getCostEntityList() {
+        return costEntityList;
+    }
+
+    public void setCostEntityList(List<DeliveryCostEntity> costEntityList) {
+        this.costEntityList = costEntityList;
+    }
+
     @Override
     public String toString() {
         return "DeliveryEntity{" +
@@ -163,6 +174,7 @@ public class DeliveryEntity {
                 ", registrationNumber='" + registrationNumber + '\'' +
                 ", active=" + active +
                 ", adminEntity=" + adminEntity +
+                ", costEntityList=" + costEntityList +
                 '}';
     }
 }

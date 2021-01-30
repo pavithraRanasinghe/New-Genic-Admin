@@ -1,6 +1,7 @@
 package lk.robot.newgenicadmin.service.impl;
 
 import lk.robot.newgenicadmin.dto.request.UserRequestDTO;
+import lk.robot.newgenicadmin.dto.request.UserUpdateRequestDTO;
 import lk.robot.newgenicadmin.dto.response.SignInResponseDTO;
 import lk.robot.newgenicadmin.entity.AdminEntity;
 import lk.robot.newgenicadmin.enums.Role;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -81,6 +83,33 @@ public class AdminServiceImpl implements AdminService {
             return new ResponseEntity<>("Invalid user credential",HttpStatus.UNAUTHORIZED);
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> updateAdmin(UserUpdateRequestDTO userUpdateRequestDTO, long adminId) {
+        try{
+            Optional<AdminEntity> admin = adminRepository.findById(adminId);
+            if (!userUpdateRequestDTO.equals(null)){
+                AdminEntity adminEntity = new AdminEntity();
+                adminEntity.setAdminId(admin.get().getAdminId());
+                adminEntity.setFirstName(userUpdateRequestDTO.getFirstName());
+                adminEntity.setLastName(userUpdateRequestDTO.getLastName());
+                adminEntity.setGender(userUpdateRequestDTO.getGender());
+                adminEntity.setGmail(userUpdateRequestDTO.getGmail());
+                adminEntity.setMobile(userUpdateRequestDTO.getMobile());
+
+                AdminEntity save = adminRepository.save(adminEntity);
+                if (save.equals(null)){
+                    return new ResponseEntity<>("Admin not updated",HttpStatus.BAD_REQUEST);
+                }
+                return new ResponseEntity<>("Admin saved",HttpStatus.OK);
+
+            }else {
+                return new ResponseEntity<>("User update details not found",HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            throw new CustomException(e.getMessage());
         }
     }
 
