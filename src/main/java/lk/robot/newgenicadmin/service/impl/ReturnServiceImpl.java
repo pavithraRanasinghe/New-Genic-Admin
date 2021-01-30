@@ -91,6 +91,9 @@ public class ReturnServiceImpl implements ReturnService {
                     PaymentEntity paymentEntity = returnEntity.getOrderEntity().getPaymentEntity();
                     double refund = calculateRefund(paymentEntity);
                     paymentEntity.setRefund(refund);
+                    paymentEntity.setPaymentDate(DateConverter.localDateToSql(LocalDate.now()));
+                    paymentEntity.setPaymentTime(DateConverter.localTimeToSql(LocalTime.now()));
+                    paymentEntity.setPaid(true);
                     paymentRepository.save(paymentEntity);
 
                     returnEntity.setAction(ReturnAction.REFUND.toString());
@@ -197,10 +200,10 @@ public class ReturnServiceImpl implements ReturnService {
 
     private PaymentEntity setPayment(ReorderPriceWeightDTO reorderPriceWeightDTO) {
         PaymentEntity paymentEntity = new PaymentEntity();
-        paymentEntity.setRefund(reorderPriceWeightDTO.getTotalPrice() + reorderPriceWeightDTO.getTotalPrice());
+        paymentEntity.setReorder(reorderPriceWeightDTO.getTotalPrice() + reorderPriceWeightDTO.getTotalPrice());
         paymentEntity.setPaymentDate(DateConverter.localDateToSql(LocalDate.now()));
         paymentEntity.setPaymentTime(DateConverter.localTimeToSql(LocalTime.now()));
-
+        paymentEntity.setPaid(true);
         return paymentEntity;
     }
 

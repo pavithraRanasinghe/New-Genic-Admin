@@ -1,28 +1,37 @@
 package lk.robot.newgenicadmin.service.impl;
 
 import lk.robot.newgenicadmin.dto.*;
+import lk.robot.newgenicadmin.dto.request.ShipOrderRequestDTO;
 import lk.robot.newgenicadmin.dto.response.OrderResponseDTO;
 import lk.robot.newgenicadmin.entity.OrderDetailEntity;
 import lk.robot.newgenicadmin.entity.OrderEntity;
+import lk.robot.newgenicadmin.entity.PaymentEntity;
+import lk.robot.newgenicadmin.enums.OrderStatus;
 import lk.robot.newgenicadmin.exception.CustomException;
 import lk.robot.newgenicadmin.repository.OrderDetailRepository;
 import lk.robot.newgenicadmin.repository.OrderRepository;
+import lk.robot.newgenicadmin.repository.PaymentRepository;
 import lk.robot.newgenicadmin.service.OrderService;
+import lk.robot.newgenicadmin.util.DateConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private final ModelMapper modelMapper;
     private OrderRepository orderRepository;
     private OrderDetailRepository orderDetailRepository;
-    private final ModelMapper modelMapper;
+    private PaymentRepository paymentRepository;
 
     @Autowired
     public OrderServiceImpl(ModelMapper modelMapper,
@@ -63,6 +72,62 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public ResponseEntity<?> shipOrder(ShipOrderRequestDTO shipOrderRequestDTO) {
+        try{
+            if (!shipOrderRequestDTO.equals(null)){
+                Optional<OrderEntity> order = orderRepository.findById(shipOrderRequestDTO.getOrderId());
+                if (order.isPresent()){
+                    if (order.get().getStatus() == OrderStatus.PENDING.toString()){
+                        order.get().setStatus(OrderStatus.SHIPPED.toString());
+                        order.get().setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
+                        order.get().setPickUpTime(DateConverter.localTimeToSql(LocalTime.now()));
+                        order.get().setTrackingNumber(shipOrderRequestDTO.getTrackingNumber());
+
+                        OrderEntity save = orderRepository.save(order.get());
+                        if (save.equals(null)){
+                            return new ResponseEntity<>("Order not shipped",HttpStatus.BAD_REQUEST);
+                        }
+                        return new ResponseEntity<>("Order shipped",HttpStatus.OK);
+                    }else {
+                        return new ResponseEntity<>("No order ordered",HttpStatus.NOT_FOUND);
+                    }
+                }else {
+                    return new ResponseEntity<>("Order not found",HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                return new ResponseEntity<>("Order id not found",HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            throw new CustomException(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> deliveredOrder(long orderId) {
+        try{
+            if (orderId != 0){
+                Optional<OrderEntity> order = orderRepository.findById(orderId);
+                if (order.isPresent() && (order.get().getStatus() == OrderStatus.SHIPPED.toString())){
+                    order.get().setStatus(OrderStatus.DELIVERED.toString());
+                    OrderEntity save = orderRepository.save(order.get());
+                    if (save.equals(null)){
+                        return new ResponseEntity<>("Order not delivered",HttpStatus.BAD_REQUEST);
+                    }
+                    paymentRepository.save(setPaymentDetails(order.get()));
+
+                    return new ResponseEntity<>("Order delivered",HttpStatus.OK);
+                }else{
+                    return new ResponseEntity<>("Order not found",HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                return new ResponseEntity<>("Order id not found",HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            throw new CustomException(e.getMessage());
+        }
+    }
+
     private OrderProductDTO orderDetailEntityToDTO(OrderDetailEntity orderDetailEntity){
 
         OrderProductDTO orderProductDTO = modelMapper.map(orderDetailEntity.getProductEntity(), OrderProductDTO.class);
@@ -70,23 +135,6 @@ public class OrderServiceImpl implements OrderService {
         orderProductDTO.setQty(orderDetailEntity.getQuantity());
         orderProductDTO.setProductOrderPrice(orderDetailEntity.getOrderPrice());
         return orderProductDTO;
-//        return new OrderProductDTO(
-//                orderDetailEntity.getProductEntity().getProductId(),
-//                orderDetailEntity.getProductEntity().getProductCode(),
-//                orderDetailEntity.getProductEntity().getName(),
-//                orderDetailEntity.getProductEntity().getDescription(),
-//                orderDetailEntity.getProductEntity().getStock(),
-//                orderDetailEntity.getProductEntity().getColor(),
-//                orderDetailEntity.getProductEntity().getSize(),
-//                orderDetailEntity.getProductEntity().getGender(),
-//                orderDetailEntity.getProductEntity().getWeight(),
-//                orderDetailEntity.getProductEntity().getSalePrice(),
-//                orderDetailEntity.getProductEntity().getRetailPrice(),
-//                orderDetailEntity.getProductEntity().isFreeShipping(),
-//                orderDetailEntity.getProductEntity().getDealEntity().getDiscount(),
-//                orderDetailEntity.getQuantity(),
-//                orderDetailEntity.getOrderPrice()
-//        );
     }
 
     private OrderResponseDTO orderEntityToDTO(OrderEntity orderEntity,List<OrderProductDTO> productDTOList){
@@ -115,5 +163,13 @@ public class OrderServiceImpl implements OrderService {
                 return "DELIVER_FAILED";
         }
         return null;
+    }
+
+    private PaymentEntity setPaymentDetails(OrderEntity orderEntity){
+        PaymentEntity paymentEntity = orderEntity.getPaymentEntity();
+        paymentEntity.setPaymentDate(DateConverter.localDateToSql(LocalDate.now()));
+        paymentEntity.setPaymentTime(DateConverter.localTimeToSql(LocalTime.now()));
+        paymentEntity.setPaid(true);
+        return paymentEntity;
     }
 }
