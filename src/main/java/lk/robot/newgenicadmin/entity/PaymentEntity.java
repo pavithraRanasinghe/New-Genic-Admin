@@ -14,6 +14,8 @@ public class PaymentEntity {
     private long paymentId;
     @Column(name = "order_price")
     private double orderPrice;
+    @Column(name = "buying_price")
+    private double buyingPrice;
     @Column(name = "delivery_price")
     private double deliveryPrice;
     @Column(name = "free_delivery_price")
@@ -37,6 +39,7 @@ public class PaymentEntity {
     public PaymentEntity(long paymentId,
                          double orderPrice,
                          double deliveryPrice,
+                         double buyingPrice,
                          double freeDeliveryPrice,
                          double discountPrice,
                          double refund,
@@ -47,6 +50,7 @@ public class PaymentEntity {
                          OrderEntity orderEntity) {
         this.paymentId = paymentId;
         this.orderPrice = orderPrice;
+        this.buyingPrice = buyingPrice;
         this.deliveryPrice = deliveryPrice;
         this.freeDeliveryPrice = freeDeliveryPrice;
         this.discountPrice = discountPrice;
@@ -72,6 +76,14 @@ public class PaymentEntity {
 
     public void setOrderPrice(double orderPrice) {
         this.orderPrice = orderPrice;
+    }
+
+    public double getBuyingPrice() {
+        return buyingPrice;
+    }
+
+    public void setBuyingPrice(double buyingPrice) {
+        this.buyingPrice = buyingPrice;
     }
 
     public double getDeliveryPrice() {
@@ -151,6 +163,7 @@ public class PaymentEntity {
         return "PaymentEntity{" +
                 "paymentId=" + paymentId +
                 ", orderPrice=" + orderPrice +
+                ", buyingPrice=" + buyingPrice +
                 ", deliveryPrice=" + deliveryPrice +
                 ", freeDeliveryPrice=" + freeDeliveryPrice +
                 ", discountPrice=" + discountPrice +

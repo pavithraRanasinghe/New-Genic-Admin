@@ -4,5 +4,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface FinanceService {
 
-    ResponseEntity<?> findMonthlyFinance();
+    ResponseEntity<?> findProfit();
 }
