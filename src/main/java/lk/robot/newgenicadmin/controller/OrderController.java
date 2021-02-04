@@ -30,6 +30,14 @@ public class OrderController {
         return allOrders;
     }
 
+    @PostMapping("/invoice")
+    public ResponseEntity<?> printInvoice(long orderId, Principal principal){
+        LOGGER.info("request - admin | printInvoice | orderId: {} | adminId: {}",orderId , principal.getName());
+        ResponseEntity<?> invoice = orderService.printInvoice(orderId);
+        LOGGER.info("response - admin | printInvoice | invoice: {}",invoice.getBody());
+        return invoice;
+    }
+
     @PatchMapping("/shipOrder/{orderId}")
     public ResponseEntity<?> shipOrder(@RequestBody ShipOrderRequestDTO shipOrderRequestDTO, Principal principal){
         LOGGER.info("request - admin | shipOrder  | shipOrderRequest: {} | adminId: {}",shipOrderRequestDTO,principal.getName());

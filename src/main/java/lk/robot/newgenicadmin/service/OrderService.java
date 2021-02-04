@@ -10,4 +10,6 @@ public interface OrderService {
     ResponseEntity<?> shipOrder(ShipOrderRequestDTO shipOrderRequestDTO);
 
     ResponseEntity<?> deliveredOrder(long orderId);
+
+    ResponseEntity<?> printInvoice(long orderId);
 }

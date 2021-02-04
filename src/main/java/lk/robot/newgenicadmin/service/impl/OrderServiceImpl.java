@@ -2,6 +2,7 @@ package lk.robot.newgenicadmin.service.impl;
 
 import lk.robot.newgenicadmin.dto.*;
 import lk.robot.newgenicadmin.dto.request.ShipOrderRequestDTO;
+import lk.robot.newgenicadmin.dto.response.InvoiceResponseDTO;
 import lk.robot.newgenicadmin.dto.response.OrderResponseDTO;
 import lk.robot.newgenicadmin.entity.OrderDetailEntity;
 import lk.robot.newgenicadmin.entity.OrderEntity;
@@ -44,13 +45,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ResponseEntity<?> getOrders(String type) {
-        try{
+        try {
             String orderType = checkOrderType(type);
-            if (orderType.equals(null)){
-                return new ResponseEntity<>("Invalid order type",HttpStatus.BAD_REQUEST);
+            if (orderType.equals(null)) {
+                return new ResponseEntity<>("Invalid order type", HttpStatus.BAD_REQUEST);
             }
             List<OrderEntity> orderList = orderRepository.findByStatus(orderType);
-            if (!orderList.isEmpty()){
+            if (!orderList.isEmpty()) {
                 List<OrderResponseDTO> responseList = new ArrayList<>();
                 for (OrderEntity orderEntity :
                         orderList) {
@@ -63,72 +64,90 @@ public class OrderServiceImpl implements OrderService {
                     OrderResponseDTO orderResponseDTO = orderEntityToDTO(orderEntity, productDTOList);
                     responseList.add(orderResponseDTO);
                 }
-                return new ResponseEntity<>(responseList,HttpStatus.OK);
-            }else {
+                return new ResponseEntity<>(responseList, HttpStatus.OK);
+            } else {
                 return new ResponseEntity<>("No orders yet", HttpStatus.NOT_FOUND);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
 
     @Override
     public ResponseEntity<?> shipOrder(ShipOrderRequestDTO shipOrderRequestDTO) {
-        try{
-            if (!shipOrderRequestDTO.equals(null)){
+        try {
+            if (!shipOrderRequestDTO.equals(null)) {
                 Optional<OrderEntity> order = orderRepository.findById(shipOrderRequestDTO.getOrderId());
-                if (order.isPresent()){
-                    if (order.get().getStatus() == OrderStatus.PENDING.toString()){
+                if (order.isPresent()) {
+                    if (order.get().getStatus() == OrderStatus.PENDING.toString()) {
                         order.get().setStatus(OrderStatus.SHIPPED.toString());
                         order.get().setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
                         order.get().setPickUpTime(DateConverter.localTimeToSql(LocalTime.now()));
                         order.get().setTrackingNumber(shipOrderRequestDTO.getTrackingNumber());
 
                         OrderEntity save = orderRepository.save(order.get());
-                        if (save.equals(null)){
-                            return new ResponseEntity<>("Order not shipped",HttpStatus.BAD_REQUEST);
+                        if (save.equals(null)) {
+                            return new ResponseEntity<>("Order not shipped", HttpStatus.BAD_REQUEST);
                         }
-                        return new ResponseEntity<>("Order shipped",HttpStatus.OK);
-                    }else {
-                        return new ResponseEntity<>("No order ordered",HttpStatus.NOT_FOUND);
+                        return new ResponseEntity<>("Order shipped", HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("No order ordered", HttpStatus.NOT_FOUND);
                     }
-                }else {
-                    return new ResponseEntity<>("Order not found",HttpStatus.BAD_REQUEST);
+                } else {
+                    return new ResponseEntity<>("Order not found", HttpStatus.BAD_REQUEST);
                 }
-            }else {
-                return new ResponseEntity<>("Order id not found",HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Order id not found", HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
 
     @Override
     public ResponseEntity<?> deliveredOrder(long orderId) {
-        try{
-            if (orderId != 0){
+        try {
+            if (orderId != 0) {
                 Optional<OrderEntity> order = orderRepository.findById(orderId);
-                if (order.isPresent() && (order.get().getStatus() == OrderStatus.SHIPPED.toString())){
+                if (order.isPresent() && (order.get().getStatus() == OrderStatus.SHIPPED.toString())) {
                     order.get().setStatus(OrderStatus.DELIVERED.toString());
                     OrderEntity save = orderRepository.save(order.get());
-                    if (save.equals(null)){
-                        return new ResponseEntity<>("Order not delivered",HttpStatus.BAD_REQUEST);
+                    if (save.equals(null)) {
+                        return new ResponseEntity<>("Order not delivered", HttpStatus.BAD_REQUEST);
                     }
                     paymentRepository.save(setPaymentDetails(order.get()));
 
-                    return new ResponseEntity<>("Order delivered",HttpStatus.OK);
-                }else{
-                    return new ResponseEntity<>("Order not found",HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Order delivered", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>("Order not found", HttpStatus.BAD_REQUEST);
                 }
-            }else {
-                return new ResponseEntity<>("Order id not found",HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Order id not found", HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
 
-    private OrderProductDTO orderDetailEntityToDTO(OrderDetailEntity orderDetailEntity){
+    @Override
+    public ResponseEntity<?> printInvoice(long orderId) {
+        try {
+            Optional<OrderEntity> order = orderRepository.findById(orderId);
+            if (order.isPresent()) {
+                InvoiceResponseDTO invoiceResponseDTO = setInvoiceDetail(order.get());
+                if (invoiceResponseDTO.equals(null)){
+                    return new ResponseEntity<>("Invoice details not found",HttpStatus.BAD_GATEWAY);
+                }
+                return new ResponseEntity<>(invoiceResponseDTO, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Order not found", HttpStatus.BAD_GATEWAY);
+            }
+        } catch (Exception e) {
+            throw new CustomException("Failed to print invoice");
+        }
+    }
+
+    private OrderProductDTO orderDetailEntityToDTO(OrderDetailEntity orderDetailEntity) {
 
         OrderProductDTO orderProductDTO = modelMapper.map(orderDetailEntity.getProductEntity(), OrderProductDTO.class);
         orderProductDTO.setDiscount(orderDetailEntity.getProductEntity().getDealEntity().getDiscount());
@@ -137,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
         return orderProductDTO;
     }
 
-    private OrderResponseDTO orderEntityToDTO(OrderEntity orderEntity,List<OrderProductDTO> productDTOList){
+    private OrderResponseDTO orderEntityToDTO(OrderEntity orderEntity, List<OrderProductDTO> productDTOList) {
         OrderResponseDTO orderResponseDTO = modelMapper.map(orderEntity, OrderResponseDTO.class);
         orderResponseDTO.setUserDTO(modelMapper.map(orderEntity.getUserEntity(), UserDTO.class));
         orderResponseDTO.setDeliveryDTO(modelMapper.map(orderEntity.getDeliveryEntity(), DeliveryDTO.class));
@@ -149,8 +168,8 @@ public class OrderServiceImpl implements OrderService {
         return orderResponseDTO;
     }
 
-    private String checkOrderType(String type){
-        switch (type){
+    private String checkOrderType(String type) {
+        switch (type) {
             case "PENDING":
                 return "PENDING";
             case "DELIVERED":
@@ -165,11 +184,37 @@ public class OrderServiceImpl implements OrderService {
         return null;
     }
 
-    private PaymentEntity setPaymentDetails(OrderEntity orderEntity){
+    private PaymentEntity setPaymentDetails(OrderEntity orderEntity) {
         PaymentEntity paymentEntity = orderEntity.getPaymentEntity();
         paymentEntity.setPaymentDate(DateConverter.localDateToSql(LocalDate.now()));
         paymentEntity.setPaymentTime(DateConverter.localTimeToSql(LocalTime.now()));
         paymentEntity.setPaid(true);
         return paymentEntity;
+    }
+
+    private InvoiceResponseDTO setInvoiceDetail(OrderEntity order) {
+        return new InvoiceResponseDTO(
+                order.getOrderId(),
+                order.getOrderDate(),
+                order.getOrderTime(),
+                order.getTrackingNumber(),
+                order.getPaymentEntity().getOrderPrice(),
+                order.getPaymentEntity().getDeliveryPrice(),
+                order.getPaymentEntity().getDiscountPrice(),
+                (order.getPaymentEntity().getOrderPrice() + order.getPaymentEntity().getDeliveryPrice()) - order.getPaymentEntity().getDiscountPrice(),
+                modelMapper.map(order.getBillingDetail(),UserAddressDTO.class),
+                modelMapper.map(order.getShippingDetails(),UserAddressDTO.class),
+                setProductDetails(order)
+                );
+    }
+
+    private List<ProductDTO> setProductDetails(OrderEntity orderEntity){
+        List<OrderDetailEntity> orderDetailList = orderDetailRepository.findByOrderEntity(orderEntity);
+        List<ProductDTO> productList = new ArrayList<>();
+        for (OrderDetailEntity orderDetailEntity :
+                orderDetailList) {
+               productList.add(modelMapper.map(orderDetailEntity.getProductEntity(),ProductDTO.class));
+        }
+        return productList;
     }
 }
