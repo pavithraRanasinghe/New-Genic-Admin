@@ -1,5 +1,7 @@
 package lk.robot.newgenicadmin.entity;
 
+import lk.robot.newgenicadmin.enums.AuthenticationProvider;
+
 import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
@@ -12,6 +14,8 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private long userId;
+    @Column(name = "user_uuid")
+    private String userUuid;
     @Column(name = "first_name")
     private String firstName;
     @Column(name = "last_name")
@@ -34,11 +38,17 @@ public class UserEntity {
     private Date registeredDate;
     @Column(name = "registered_time")
     private Time registeredTime;
+    @Enumerated(EnumType.STRING)
+    private AuthenticationProvider authenticationProvider;
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
 
     public UserEntity() {
     }
 
     public UserEntity(long userId,
+                      String userUuid,
                       String firstName,
                       String lastName,
                       String profilePicture,
@@ -49,8 +59,11 @@ public class UserEntity {
                       String username,
                       String password,
                       Date registeredDate,
-                      Time registeredTime) {
+                      Time registeredTime,
+                      AuthenticationProvider authenticationProvider,
+                      String resetPasswordToken) {
         this.userId = userId;
+        this.userUuid = userUuid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.profilePicture = profilePicture;
@@ -62,6 +75,8 @@ public class UserEntity {
         this.password = password;
         this.registeredDate = registeredDate;
         this.registeredTime = registeredTime;
+        this.authenticationProvider = authenticationProvider;
+        this.resetPasswordToken = resetPasswordToken;
     }
 
     public long getUserId() {
@@ -70,6 +85,14 @@ public class UserEntity {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public String getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 
     public String getFirstName() {
@@ -160,10 +183,27 @@ public class UserEntity {
         this.registeredTime = registeredTime;
     }
 
+    public AuthenticationProvider getAuthenticationProvider() {
+        return authenticationProvider;
+    }
+
+    public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
+    }
+
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
+    }
+
     @Override
     public String toString() {
         return "UserEntity{" +
                 "userId=" + userId +
+                ", userUuid='" + userUuid + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", profilePicture='" + profilePicture + '\'' +
@@ -175,6 +215,8 @@ public class UserEntity {
                 ", password='" + password + '\'' +
                 ", registeredDate=" + registeredDate +
                 ", registeredTime=" + registeredTime +
+                ", authenticationProvider=" + authenticationProvider +
+                ", resetPasswordToken='" + resetPasswordToken + '\'' +
                 '}';
     }
 }

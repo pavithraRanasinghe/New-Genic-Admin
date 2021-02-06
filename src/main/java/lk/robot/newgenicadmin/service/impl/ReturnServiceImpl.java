@@ -13,6 +13,7 @@ import lk.robot.newgenicadmin.repository.*;
 import lk.robot.newgenicadmin.service.ReturnService;
 import lk.robot.newgenicadmin.util.DateConverter;
 import org.apache.tomcat.jni.Local;
+import org.hibernate.criterion.Order;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -82,11 +84,11 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
-    public ResponseEntity<?> refundReturn(long orderId) {
+    public ResponseEntity<?> refundReturn(String orderId) {
         try {
-            Optional<OrderEntity> orderEntity = orderRepository.findById(orderId);
-            if (orderEntity.isPresent()) {
-                ReturnEntity returnEntity = returnRepository.findByOrderEntity(orderEntity.get());
+            OrderEntity orderEntity = orderRepository.findByOrderUuid(orderId);
+            if (orderEntity != null) {
+                ReturnEntity returnEntity = returnRepository.findByOrderEntity(orderEntity);
                 if (!returnEntity.equals(null)) {
                     PaymentEntity paymentEntity = returnEntity.getOrderEntity().getPaymentEntity();
                     double refund = calculateRefund(paymentEntity);
@@ -117,15 +119,15 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     public ResponseEntity<?> reorderReturn(ReorderRequest reorderRequest) {
         try {
-            Optional<OrderEntity> orderEntity = orderRepository.findById(reorderRequest.getOrderId());
-            if (orderEntity.isPresent()) {
-                ReturnEntity returnEntity = returnRepository.findByOrderEntity(orderEntity.get());
+            OrderEntity orderEntity = orderRepository.findByOrderUuid(reorderRequest.getOrderId());
+            if (orderEntity != null) {
+                ReturnEntity returnEntity = returnRepository.findByOrderEntity(orderEntity);
                 if (!returnEntity.equals(null)) {
                     List<ReturnDetailEntity> returnDetails = returnDetailRepository.findByReturnEntity(returnEntity);
-                    OrderEntity newOrder = setNewOrder(orderEntity.get(),
+                    OrderEntity order = setNewOrder(orderEntity,
                             reorderRequest.getTrackingNumber(),
-                            calculateWeightAndPrice(returnDetails, orderEntity.get()));
-
+                            calculateWeightAndPrice(returnDetails, orderEntity));
+                    OrderEntity newOrder = orderRepository.save(order);
                     if (!newOrder.equals(null)) {
                         for (ReturnDetailEntity returnDetailEntity :
                                 returnDetails) {
@@ -150,7 +152,7 @@ public class ReturnServiceImpl implements ReturnService {
 
     private ReturnResponseDTO setReturnDetails(ReturnEntity returnEntity, List<ReturnDetailDTO> returnDetailList) {
         return new ReturnResponseDTO(
-                returnEntity.getOrderEntity().getOrderId(),
+                returnEntity.getOrderEntity().getOrderUuid(),
                 returnEntity.getOrderEntity().getOrderDate(),
                 returnEntity.getOrderEntity().getOrderTime(),
                 returnEntity.getRequestDate(),
@@ -173,6 +175,7 @@ public class ReturnServiceImpl implements ReturnService {
 
     private OrderEntity setNewOrder(OrderEntity orderDetail, String trackingNumber, ReorderPriceWeightDTO reorderPriceWeightDTO) {
         OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderUuid(UUID.randomUUID().toString());
         orderEntity.setStatus(OrderStatus.SHIPPED.toString());
         orderEntity.setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
         orderEntity.setPickUpTime(DateConverter.localTimeToSql(LocalTime.now()));

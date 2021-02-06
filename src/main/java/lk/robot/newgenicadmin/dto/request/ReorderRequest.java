@@ -2,23 +2,23 @@ package lk.robot.newgenicadmin.dto.request;
 
 public class ReorderRequest {
 
-    private long orderId;
+    private String orderId;
     private String trackingNumber;
 
     public ReorderRequest() {
     }
 
-    public ReorderRequest(long orderId,
+    public ReorderRequest(String orderId,
                           String trackingNumber) {
         this.orderId = orderId;
         this.trackingNumber = trackingNumber;
     }
 
-    public long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 

@@ -31,7 +31,7 @@ public class OrderController {
     }
 
     @PostMapping("/invoice")
-    public ResponseEntity<?> printInvoice(long orderId, Principal principal){
+    public ResponseEntity<?> printInvoice(String orderId, Principal principal){
         LOGGER.info("request - admin | printInvoice | orderId: {} | adminId: {}",orderId , principal.getName());
         ResponseEntity<?> invoice = orderService.printInvoice(orderId);
         LOGGER.info("response - admin | printInvoice | invoice: {}",invoice.getBody());
@@ -47,7 +47,7 @@ public class OrderController {
     }
 
     @PatchMapping("/deliveredOrder")
-    public ResponseEntity<?> deliveredOrder(@PathVariable long orderId,Principal principal){
+    public ResponseEntity<?> deliveredOrder(@PathVariable String orderId,Principal principal){
         LOGGER.info("request - admin | deliveredOrder | orderId: {} | adminId: {}",orderId,principal.getName());
         ResponseEntity<?> responseEntity = orderService.deliveredOrder(orderId);
         LOGGER.info("response - admin | deliveredOrder | response: {}",responseEntity.getBody());

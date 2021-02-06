@@ -10,7 +10,7 @@ import java.util.List;
 
 public class OrderResponseDTO {
 
-    private long orderId;
+    private String orderId;
     private Date orderDate;
     private Time orderTime;
     private double totalWeight;
@@ -27,7 +27,7 @@ public class OrderResponseDTO {
     public OrderResponseDTO() {
     }
 
-    public OrderResponseDTO(long orderId,
+    public OrderResponseDTO(String orderId,
                             Date orderDate,
                             Time orderTime,
                             double totalWeight,
@@ -55,11 +55,11 @@ public class OrderResponseDTO {
         this.orderPaymentDTO = orderPaymentDTO;
     }
 
-    public long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 

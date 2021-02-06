@@ -77,15 +77,15 @@ public class OrderServiceImpl implements OrderService {
     public ResponseEntity<?> shipOrder(ShipOrderRequestDTO shipOrderRequestDTO) {
         try {
             if (!shipOrderRequestDTO.equals(null)) {
-                Optional<OrderEntity> order = orderRepository.findById(shipOrderRequestDTO.getOrderId());
-                if (order.isPresent()) {
-                    if (order.get().getStatus() == OrderStatus.PENDING.toString()) {
-                        order.get().setStatus(OrderStatus.SHIPPED.toString());
-                        order.get().setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
-                        order.get().setPickUpTime(DateConverter.localTimeToSql(LocalTime.now()));
-                        order.get().setTrackingNumber(shipOrderRequestDTO.getTrackingNumber());
+                OrderEntity order = orderRepository.findByOrderUuid(shipOrderRequestDTO.getOrderId());
+                if (order != null) {
+                    if (order.getStatus() == OrderStatus.PENDING.toString()) {
+                        order.setStatus(OrderStatus.SHIPPED.toString());
+                        order.setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
+                        order.setPickUpTime(DateConverter.localTimeToSql(LocalTime.now()));
+                        order.setTrackingNumber(shipOrderRequestDTO.getTrackingNumber());
 
-                        OrderEntity save = orderRepository.save(order.get());
+                        OrderEntity save = orderRepository.save(order);
                         if (save.equals(null)) {
                             return new ResponseEntity<>("Order not shipped", HttpStatus.BAD_REQUEST);
                         }
@@ -105,17 +105,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<?> deliveredOrder(long orderId) {
+    public ResponseEntity<?> deliveredOrder(String orderId) {
         try {
-            if (orderId != 0) {
-                Optional<OrderEntity> order = orderRepository.findById(orderId);
-                if (order.isPresent() && (order.get().getStatus() == OrderStatus.SHIPPED.toString())) {
-                    order.get().setStatus(OrderStatus.DELIVERED.toString());
-                    OrderEntity save = orderRepository.save(order.get());
+            if (orderId != null) {
+                OrderEntity order = orderRepository.findByOrderUuid(orderId);
+                if (order != null && (order.getStatus() == OrderStatus.SHIPPED.toString())) {
+                    order.setStatus(OrderStatus.DELIVERED.toString());
+                    OrderEntity save = orderRepository.save(order);
                     if (save.equals(null)) {
                         return new ResponseEntity<>("Order not delivered", HttpStatus.BAD_REQUEST);
                     }
-                    paymentRepository.save(setPaymentDetails(order.get()));
+                    paymentRepository.save(setPaymentDetails(order));
 
                     return new ResponseEntity<>("Order delivered", HttpStatus.OK);
                 } else {
@@ -130,11 +130,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<?> printInvoice(long orderId) {
+    public ResponseEntity<?> printInvoice(String orderId) {
         try {
-            Optional<OrderEntity> order = orderRepository.findById(orderId);
-            if (order.isPresent()) {
-                InvoiceResponseDTO invoiceResponseDTO = setInvoiceDetail(order.get());
+            OrderEntity order = orderRepository.findByOrderUuid(orderId);
+            if (order != null) {
+                InvoiceResponseDTO invoiceResponseDTO = setInvoiceDetail(order);
                 if (invoiceResponseDTO.equals(null)){
                     return new ResponseEntity<>("Invoice details not found",HttpStatus.BAD_GATEWAY);
                 }
@@ -194,7 +194,7 @@ public class OrderServiceImpl implements OrderService {
 
     private InvoiceResponseDTO setInvoiceDetail(OrderEntity order) {
         return new InvoiceResponseDTO(
-                order.getOrderId(),
+                order.getOrderUuid(),
                 order.getOrderDate(),
                 order.getOrderTime(),
                 order.getTrackingNumber(),
@@ -204,8 +204,7 @@ public class OrderServiceImpl implements OrderService {
                 (order.getPaymentEntity().getOrderPrice() + order.getPaymentEntity().getDeliveryPrice()) - order.getPaymentEntity().getDiscountPrice(),
                 modelMapper.map(order.getBillingDetail(),UserAddressDTO.class),
                 modelMapper.map(order.getShippingDetails(),UserAddressDTO.class),
-                setProductDetails(order)
-                );
+                setProductDetails(order));
     }
 
     private List<ProductDTO> setProductDetails(OrderEntity orderEntity){

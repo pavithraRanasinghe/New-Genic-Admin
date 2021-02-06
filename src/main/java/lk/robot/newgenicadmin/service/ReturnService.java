@@ -7,7 +7,7 @@ public interface ReturnService {
 
     ResponseEntity<?> getReturnRequest();
 
-    ResponseEntity<?> refundReturn(long orderId);
+    ResponseEntity<?> refundReturn(String orderId);
 
     ResponseEntity<?> reorderReturn(ReorderRequest reorderRequest);
 }

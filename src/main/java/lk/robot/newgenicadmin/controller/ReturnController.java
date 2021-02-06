@@ -29,7 +29,7 @@ public class ReturnController {
     }
 
     @PostMapping("/refund/{orderId}")
-    public ResponseEntity<?> refundReturn(@PathVariable long orderId, Principal principal){
+    public ResponseEntity<?> refundReturn(@PathVariable String orderId, Principal principal){
         LOGGER.info("request - admin | refundReturn | orderId: {} | adminId: {}",orderId,principal.getName());
         ResponseEntity<?> refund = returnService.refundReturn(orderId);
         LOGGER.info("response - admin | refundReturn | refundRequest: {}",refund.getBody().toString());

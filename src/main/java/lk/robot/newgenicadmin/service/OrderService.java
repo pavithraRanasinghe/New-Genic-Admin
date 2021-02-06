@@ -9,7 +9,7 @@ public interface OrderService {
 
     ResponseEntity<?> shipOrder(ShipOrderRequestDTO shipOrderRequestDTO);
 
-    ResponseEntity<?> deliveredOrder(long orderId);
+    ResponseEntity<?> deliveredOrder(String orderId);
 
-    ResponseEntity<?> printInvoice(long orderId);
+    ResponseEntity<?> printInvoice(String orderId);
 }

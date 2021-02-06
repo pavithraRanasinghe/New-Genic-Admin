@@ -9,7 +9,7 @@ import java.util.List;
 
 public class InvoiceResponseDTO {
 
-    private long orderId;
+    private String orderId;
     private Date orderDate;
     private Time orderTime;
     private String trackingNumber;
@@ -24,7 +24,7 @@ public class InvoiceResponseDTO {
     public InvoiceResponseDTO() {
     }
 
-    public InvoiceResponseDTO(long orderId,
+    public InvoiceResponseDTO(String orderId,
                               Date orderDate,
                               Time orderTime,
                               String trackingNumber,
@@ -48,11 +48,11 @@ public class InvoiceResponseDTO {
         this.productDTOList = productDTOList;
     }
 
-    public long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 

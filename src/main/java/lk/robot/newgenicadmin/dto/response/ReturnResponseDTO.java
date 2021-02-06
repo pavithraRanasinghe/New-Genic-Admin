@@ -10,7 +10,7 @@ import java.util.List;
 public class ReturnResponseDTO {
 
 
-    private long orderId;
+    private String orderId;
     private Date orderDate;
     private Time orderTime;
     private Date requestDate;
@@ -20,7 +20,7 @@ public class ReturnResponseDTO {
     public ReturnResponseDTO() {
     }
 
-    public ReturnResponseDTO(long orderId,
+    public ReturnResponseDTO(String orderId,
                              Date orderDate,
                              Time orderTime,
                              Date requestDate,
@@ -34,11 +34,11 @@ public class ReturnResponseDTO {
         this.returnDetailDTOList = returnDetailDTOList;
     }
 
-    public long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
