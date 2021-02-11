@@ -64,13 +64,14 @@ public class FinanceServiceImpl implements FinanceService {
         }
     }
 
+    // TODO: 2/11/21 Fix this commented shit!!!!!!
     private double findBuyingPrice(OrderEntity orderEntity){
         List<OrderDetailEntity> orderDetailList = orderDetailRepository.findByOrderEntity(orderEntity);
         double orderBuyingPrice = 0;
         if (!orderDetailList.isEmpty()){
             for (OrderDetailEntity orderDetailEntity :
                     orderDetailList) {
-                orderBuyingPrice = orderDetailEntity.getProductEntity().getBuyingPrice() * orderDetailEntity.getQuantity();
+//                orderBuyingPrice = orderDetailEntity.getProductEntity().getBuyingPrice() * orderDetailEntity.getQuantity();
             }
         }
         return orderBuyingPrice;

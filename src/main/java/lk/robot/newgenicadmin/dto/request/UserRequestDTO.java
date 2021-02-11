@@ -1,23 +1,27 @@
 package lk.robot.newgenicadmin.dto.request;
 
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 public class UserRequestDTO {
 
     private String firstName;
     private String lastName;
-    @NotNull(message = "User name required")
+    @NotEmpty(message = "User name cannot be null or empty")
+    @NotNull(message = "User name cannot be null or empty")
     private String userName;
+
     private String nic;
     private String gender;
-    @NotNull(message = "Email required.cannot be blank")
+    @NotEmpty(message = "Email cannot be null or empty")
+    @NotNull(message = "Email cannot be null or empty")
     @Email(message = "Please input valid email address")
     private String gmail;
+    @Pattern(regexp = "[0-9]{9,10}",message = "Please input valid mobile number")
     private String mobile;
     private String profilePicture;
-    @NotNull(message = "Password shouldn't empty")
+    @Size(min = 7, message = "Password should have 8 characters")
+    @NotEmpty(message = "Password cannot be null or empty")
+    @NotNull(message = "Password cannot be null or empty")
     private String password;
 
     public UserRequestDTO() {

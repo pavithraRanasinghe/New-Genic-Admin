@@ -1,6 +1,5 @@
 package lk.robot.newgenicadmin.dto;
 
-import java.util.Date;
 
 public class OrderProductDTO {
 

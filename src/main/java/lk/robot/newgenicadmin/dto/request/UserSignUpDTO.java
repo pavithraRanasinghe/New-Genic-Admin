@@ -1,13 +1,22 @@
 package lk.robot.newgenicadmin.dto.request;
 
-public class UserSignUpDTO {
+import javax.validation.constraints.*;
 
+public class UserSignUpDTO {
+    // TODO: 2/8/21 this class must be remove
     private String firstName;
     private String lastName;
     private String userName;
+    @NotEmpty(message = "Email cannot be null or empty")
+    @NotNull(message = "Email cannot be null or empty")
+    @Email(message = "Please input valid email address")
     private String gmail;
+    @Pattern(regexp = "[0-9]{9,10}",message = "Please input valid mobile number")
     private String mobile;
     private String dob;
+    @Size(min = 7, message = "Password should have 8 characters")
+    @NotEmpty(message = "Password cannot be null or empty")
+    @NotNull(message = "Password cannot be null or empty")
     private String password;
     private String profilePicture;
     private String role;

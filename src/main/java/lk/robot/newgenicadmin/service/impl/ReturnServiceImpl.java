@@ -192,10 +192,11 @@ public class ReturnServiceImpl implements ReturnService {
         return orderEntity;
     }
 
+    // TODO: 2/11/21 Fix this commented shit!!!!!!
     private OrderDetailEntity setNewOrderDetail(ReturnDetailEntity returnDetailEntity, OrderEntity orderEntity) {
         OrderDetailEntity orderDetailEntity = new OrderDetailEntity();
         orderDetailEntity.setQuantity(returnDetailEntity.getReturnQty());
-        orderDetailEntity.setOrderPrice(returnDetailEntity.getOrderDetailEntity().getProductEntity().getRetailPrice() * returnDetailEntity.getReturnQty());
+//        orderDetailEntity.setOrderPrice(returnDetailEntity.getOrderDetailEntity().getProductEntity().getRetailPrice() * returnDetailEntity.getReturnQty());
         orderDetailEntity.setProductEntity(returnDetailEntity.getOrderDetailEntity().getProductEntity());
         orderDetailEntity.setOrderEntity(orderEntity);
         return orderDetailEntity;
@@ -210,6 +211,7 @@ public class ReturnServiceImpl implements ReturnService {
         return paymentEntity;
     }
 
+    // TODO: 2/11/21 Fix this commented shit!!!!!!
     private ReorderPriceWeightDTO calculateWeightAndPrice(List<ReturnDetailEntity> returnDetails, OrderEntity orderEntity) {
         String district = orderEntity.getShippingDetails().getDistrict();
         double totalWeight = 0;
@@ -217,8 +219,8 @@ public class ReturnServiceImpl implements ReturnService {
         double deliveryPrice = 0;
         for (ReturnDetailEntity returnDetailEntity :
                 returnDetails) {
-            totalWeight += (returnDetailEntity.getReturnQty() * returnDetailEntity.getOrderDetailEntity().getProductEntity().getWeight());
-            totalPrice += (returnDetailEntity.getReturnQty() * returnDetailEntity.getOrderDetailEntity().getProductEntity().getRetailPrice());
+//            totalWeight += (returnDetailEntity.getReturnQty() * returnDetailEntity.getOrderDetailEntity().getProductEntity().getWeight());
+//            totalPrice += (returnDetailEntity.getReturnQty() * returnDetailEntity.getOrderDetailEntity().getProductEntity().getRetailPrice());
         }
 
         DeliveryCostEntity districtPrice = deliveryCostRepository.findByDistrictAndDeliveryEntity(district, orderEntity.getDeliveryEntity());
