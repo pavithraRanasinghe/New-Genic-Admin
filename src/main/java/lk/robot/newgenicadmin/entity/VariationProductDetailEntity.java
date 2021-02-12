@@ -3,7 +3,7 @@ package lk.robot.newgenicadmin.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "variation_detail")
+@Table(name = "variation_product_detail")
 public class VariationProductDetailEntity {
 
     @Id
@@ -11,7 +11,7 @@ public class VariationProductDetailEntity {
     @Column(name = "variation_product_detail_id")
     private long variationProductDetailId;
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "variation_value_id")
+    @JoinColumn(name = "variation_id")
     private VariationEntity variationEntity;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")

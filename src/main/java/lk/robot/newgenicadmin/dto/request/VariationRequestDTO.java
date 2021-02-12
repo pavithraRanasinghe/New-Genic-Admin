@@ -4,7 +4,6 @@ import java.util.List;
 
 public class VariationRequestDTO {
 
-    private long variationId;
     private String variationName;
     private String variationDescription;
     private List<String> valueList;
@@ -12,24 +11,13 @@ public class VariationRequestDTO {
     public VariationRequestDTO() {
     }
 
-    public VariationRequestDTO(long variationId,
-                               String variationName,
+    public VariationRequestDTO(String variationName,
                                String variationDescription,
                                List<String> valueList) {
-        this.variationId = variationId;
         this.variationName = variationName;
         this.variationDescription = variationDescription;
         this.valueList = valueList;
     }
-
-    public long getVariationId() {
-        return variationId;
-    }
-
-    public void setVariationId(long variationId) {
-        this.variationId = variationId;
-    }
-
     public String getVariationName() {
         return variationName;
     }
@@ -57,7 +45,6 @@ public class VariationRequestDTO {
     @Override
     public String toString() {
         return "VariationRequestDTO{" +
-                "variationId=" + variationId +
                 ", variationName='" + variationName + '\'' +
                 ", variationDescription='" + variationDescription + '\'' +
                 ", valueList=" + valueList +

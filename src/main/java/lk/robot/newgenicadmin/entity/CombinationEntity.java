@@ -18,7 +18,7 @@ public class CombinationEntity {
     private double buyingPrice;
     @Column(name = "sale_price")
     private double salePrice;
-    @Column(name = "retailPrice")
+    @Column(name = "retail_price")
     private double retailPrice;
     private boolean active;
     @Column(name = "stock_change_date")
@@ -27,7 +27,7 @@ public class CombinationEntity {
     private Time stockChangeTime;
     @Column(name = "retail_price_change_date")
     private Date retailPriceChangeDate;
-    @Column(name = "retailPriceChangeTime")
+    @Column(name = "retail_price_change_time")
     private Time retailPriceChangeTime;
 
     public CombinationEntity() {

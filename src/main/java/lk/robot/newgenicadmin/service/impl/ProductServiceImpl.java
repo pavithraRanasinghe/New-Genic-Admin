@@ -109,38 +109,23 @@ public class ProductServiceImpl implements ProductService {
                 List<List<VariationDetailDTO>> places = new ArrayList<>();
                 for (VariationRequestDTO variationRequestDTO :
                         variationRequestDTOList) {
-                    VariationEntity variationEntity = variationRepository.findById(variationRequestDTO.getVariationId()).get();
                     List<VariationDetailDTO> variationCombinationType = new ArrayList<>();
-                    if (variationEntity != null) {
-                        for (String value :
-                                variationRequestDTO.getValueList()) {
-                            VariationDetailEntity variationDetail = variationDetailRepository.findByValueAndVariationEntity(value, variationEntity);
-                            if (variationDetail == null) {
-                                VariationDetailEntity newVariationDetail = new VariationDetailEntity();
-                                newVariationDetail.setValue(value);
-                                newVariationDetail.setVariationEntity(variationEntity);
+                    VariationEntity newVariation = new VariationEntity();
+                    newVariation.setVariationName(variationRequestDTO.getVariationName());
+                    newVariation.setVariationDescription(variationRequestDTO.getVariationDescription());
 
-                                variationDetail = variationDetailRepository.save(newVariationDetail);
-                            }
-                            variationCombinationType.add(modelMapper.map(variationDetail, VariationDetailDTO.class));
-                        }
-                    } else {
-                        VariationEntity newVariation = new VariationEntity();
-                        newVariation.setVariationName(variationRequestDTO.getVariationName());
-                        newVariation.setVariationDescription(variationRequestDTO.getVariationDescription());
+                    VariationEntity variationEntity = variationRepository.save(newVariation);
 
-                        variationEntity = variationRepository.save(newVariation);
+                    for (String value :
+                            variationRequestDTO.getValueList()) {
+                        VariationDetailEntity newVariationDetail = new VariationDetailEntity();
+                        newVariationDetail.setValue(value);
+                        newVariationDetail.setVariationEntity(variationEntity);
 
-                        for (String value :
-                                variationRequestDTO.getValueList()) {
-                            VariationDetailEntity newVariationDetail = new VariationDetailEntity();
-                            newVariationDetail.setValue(value);
-                            newVariationDetail.setVariationEntity(variationEntity);
-
-                            VariationDetailEntity detailEntity = variationDetailRepository.save(newVariationDetail);
-                            variationCombinationType.add(modelMapper.map(detailEntity, VariationDetailDTO.class));
-                        }
+                        VariationDetailEntity detailEntity = variationDetailRepository.save(newVariationDetail);
+                        variationCombinationType.add(modelMapper.map(detailEntity, VariationDetailDTO.class));
                     }
+
                     places.add(variationCombinationType);
                 }
                 LinkedList<VariationDetailDTO> tokens = new LinkedList<>();
