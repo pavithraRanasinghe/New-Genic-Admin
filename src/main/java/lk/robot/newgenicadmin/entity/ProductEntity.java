@@ -26,19 +26,19 @@ public class ProductEntity {
     private Date addedDate;
     @Column(name = "added_time",nullable = false)
     private Time addedTime;
-    @Column(name = "update_date",nullable = false)
+    @Column(name = "update_date")
     private Date updateDate;
-    @Column(name = "update_time",nullable = false)
+    @Column(name = "update_time")
     private Time updateTime;
     @Column(nullable = false)
     private boolean active;
     @Column(name = "is_free_shipping")
     private boolean isFreeShipping;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_sub_category_id")
     private SubCategoryEntity subCategoryEntity;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_deal_id")
     private DealEntity dealEntity;
 

@@ -38,9 +38,9 @@ public class UserEntity {
     private Date registeredDate;
     @Column(name = "registered_time")
     private Time registeredTime;
-    @Column(name = "update_date",nullable = false)
+    @Column(name = "update_date")
     private Date updateDate;
-    @Column(name = "update_time",nullable = false)
+    @Column(name = "update_time")
     private Time updateTime;
     @Enumerated(EnumType.STRING)
     private AuthenticationProvider authenticationProvider;

@@ -46,11 +46,22 @@ public class AdminServiceImpl implements AdminService {
             adminEntity.setRegisteredDate(DateConverter.localDateToSql(LocalDate.now()));
             adminEntity.setRegisteredTime(DateConverter.localTimeToSql(LocalTime.now()));
 
-            AdminEntity save = adminRepository.save(adminEntity);
-            if (save.equals(null)){
+            AdminEntity admin = adminRepository.save(adminEntity);
+            if (admin.equals(null)){
                 return new ResponseEntity<>("Admin saved failed",HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<>("Admin saved to system", HttpStatus.OK);
+            String token = generateToken(admin);
+            if (token.equals(null)){
+                return new ResponseEntity<>("Token not generated",HttpStatus.UNAUTHORIZED);
+            }
+            SignInResponseDTO signInResponseDTO = new SignInResponseDTO(
+                    token,
+                    admin.getUuid(),
+                    admin.getUsername(),
+                    LocalDate.now(),
+                    LocalTime.now()
+            );
+            return new ResponseEntity<>(signInResponseDTO,HttpStatus.OK);
         }catch (Exception e){
             throw new CustomException("Admin sign up failed");
         }
@@ -73,7 +84,7 @@ public class AdminServiceImpl implements AdminService {
                 }
                 SignInResponseDTO signInResponseDTO = new SignInResponseDTO(
                         token,
-                        admin.getAdminId(),
+                        admin.getUuid(),
                         admin.getUsername(),
                         LocalDate.now(),
                         LocalTime.now()
@@ -116,6 +127,6 @@ public class AdminServiceImpl implements AdminService {
     private String generateToken(AdminEntity adminEntity){
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_"+Role.ADMIN.toString()));
-        return JwtGenerator.generateToken(adminEntity.getUsername(),Long.toString(adminEntity.getAdminId()),authorities);
+        return JwtGenerator.generateToken(adminEntity.getUsername(),adminEntity.getUuid(),authorities);
     }
 }

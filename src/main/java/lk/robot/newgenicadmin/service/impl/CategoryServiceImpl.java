@@ -44,15 +44,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<?> addCategory(CategoryRequestDTO categoryRequestDTO, long adminId) {
+    public ResponseEntity<?> addCategory(CategoryRequestDTO categoryRequestDTO, String adminId) {
         try {
             if (categoryRequestDTO != null && !categoryRequestDTO.getSubCategoryList().isEmpty()) {
-                Optional<AdminEntity> admin = adminRepository.findById(adminId);
+                Optional<AdminEntity> admin = adminRepository.findByUuid(adminId);
                 Optional<MainCategoryEntity> mainCategory = mainCategoryRepository.findById(categoryRequestDTO.getMainCategoryId());
                 if (mainCategory.isPresent()) {
                     MainSubCategoryEntity existingMainSub = mainSubCategoryRepository.findByMainSubCategoryNameAndMainCategoryEntity(
                             categoryRequestDTO.getMainSubCategoryName(), mainCategory.get());
-                    if (!existingMainSub.equals(null)) {
+                    if (existingMainSub == null) {
                         MainSubCategoryEntity mainSubCategoryEntity = new MainSubCategoryEntity();
                         mainSubCategoryEntity.setMainSubCategoryName(categoryRequestDTO.getMainSubCategoryName());
                         mainSubCategoryEntity.setMainSubCategoryDescription(categoryRequestDTO.getMainSubCategoryDescription());
@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
                             }
 
                         } else {
-                            return new ResponseEntity<>("Something wrong on main sub category", HttpStatus.BAD_REQUEST);
+                            return new ResponseEntity<>("Main sub category not saved", HttpStatus.BAD_REQUEST);
                         }
                     } else {
                         List<SubCategoryDTO> existingSubCategories = saveSubCategories(categoryRequestDTO, existingMainSub);
@@ -157,12 +157,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private List<SubCategoryDTO> saveSubCategories(CategoryRequestDTO categoryRequestDTO, MainSubCategoryEntity mainSubCategoryEntity) {
-        List<SubCategoryDTO> existingSubCategories = null;
+        List<SubCategoryDTO> existingSubCategories = new ArrayList<>();
         for (SubCategoryDTO subCategoryDTO :
                 categoryRequestDTO.getSubCategoryList()) {
             SubCategoryEntity existingSubCategory = subCategoryRepository.
                     findBySubCategoryNameAndMainSubCategoryEntity(subCategoryDTO.getSubCategoryName(), mainSubCategoryEntity);
-            if (existingSubCategory.equals(null)) {
+            if (existingSubCategory == null) {
                 SubCategoryEntity subCategoryEntity = subCategoryDtoToEntity(subCategoryDTO, mainSubCategoryEntity);
                 subCategoryRepository.save(subCategoryEntity);
             } else {

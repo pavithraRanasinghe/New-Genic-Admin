@@ -35,20 +35,20 @@ public class ProductController {
         return productBasic;
     }
 
-    @PostMapping("/addVariations")
-    public ResponseEntity<?> addVariations(@RequestBody List<VariationRequestDTO> variationRequestDTOList, Principal principal){
-        LOGGER.info("request - admin | addVariations | variationList: {} | adminId: {}",variationRequestDTOList, principal.getName());
-        ResponseEntity<?> combinations = productService.addVariations(variationRequestDTOList);
+    @PostMapping("/addVariations/{productId}")
+    public ResponseEntity<?> addVariations(@RequestBody List<VariationRequestDTO> variationRequestDTOList,@PathVariable String productId, Principal principal){
+        LOGGER.info("request - admin | addVariations | variationList: {} | productId: {} | adminId: {}",variationRequestDTOList,productId, principal.getName());
+        ResponseEntity<?> combinations = productService.addVariations(variationRequestDTOList,productId);
         LOGGER.info("response - admin | addVariations | combinations: {}",combinations.getBody());
         return combinations;
     }
 
     @PostMapping("/addImage")
-    public ResponseEntity<?> addProductImages(@RequestParam("productImageRequestDTO") ProductImageRequestDTO productImageRequestDTO,
+    public ResponseEntity<?> addProductImages(@RequestParam("data") long variationDetailId,
                                         @RequestParam("image")List<MultipartFile> multipartFiles,
                                         Principal principal){
-        LOGGER.info("request - admin | addProduct | productDetail:{} | adminId: {}", productImageRequestDTO,principal.getName());
-        ResponseEntity<?> addProduct = productService.addProductImage(productImageRequestDTO,multipartFiles);
+        LOGGER.info("request - admin | addProduct | variationDetailId:{} | adminId: {}", variationDetailId,principal.getName());
+        ResponseEntity<?> addProduct = productService.addProductImage(variationDetailId,multipartFiles);
         LOGGER.info("response - admin | addProduct | product: {}",addProduct.getBody());
         return addProduct;
     }

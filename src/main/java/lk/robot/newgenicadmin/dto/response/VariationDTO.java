@@ -1,10 +1,10 @@
-package lk.robot.newgenicadmin.dto;
+package lk.robot.newgenicadmin.dto.response;
 
 public class VariationDTO {
 
     private long variationId;
     private String variationName;
-    private long VariationDetailId;
+    private long variationDetailId;
     private String value;
 
     public VariationDTO() {
@@ -16,16 +16,16 @@ public class VariationDTO {
                         String value) {
         this.variationId = variationId;
         this.variationName = variationName;
-        VariationDetailId = variationDetailId;
+        this.variationDetailId = variationDetailId;
         this.value = value;
     }
 
-    public long getVariationId() {
-        return variationId;
+    public long getVariationDetailId() {
+        return variationDetailId;
     }
 
-    public void setVariationId(long variationId) {
-        this.variationId = variationId;
+    public void setVariationDetailId(long variationDetailId) {
+        this.variationDetailId = variationDetailId;
     }
 
     public String getVariationName() {
@@ -36,12 +36,12 @@ public class VariationDTO {
         this.variationName = variationName;
     }
 
-    public long getVariationDetailId() {
-        return VariationDetailId;
+    public long getVariationId() {
+        return variationId;
     }
 
-    public void setVariationDetailId(long variationDetailId) {
-        VariationDetailId = variationDetailId;
+    public void setVariationId(long variationId) {
+        this.variationId = variationId;
     }
 
     public String getValue() {
@@ -57,7 +57,7 @@ public class VariationDTO {
         return "VariationDTO{" +
                 "variationId=" + variationId +
                 ", variationName='" + variationName + '\'' +
-                ", VariationDetailId=" + VariationDetailId +
+                ", variationDetailId=" + variationDetailId +
                 ", value='" + value + '\'' +
                 '}';
     }

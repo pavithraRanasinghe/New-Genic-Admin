@@ -31,7 +31,7 @@ public class DealEntity {
     @Column
     @Enumerated(EnumType.STRING)
     private DealStatus dealStatus;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_admin_id")
     private AdminEntity adminEntity;
 

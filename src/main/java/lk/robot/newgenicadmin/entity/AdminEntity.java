@@ -12,6 +12,8 @@ public class AdminEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
     private long adminId;
+    @Column
+    private String uuid;
     @Column(name = "first_name")
     private String firstName;
     @Column(name = "last_name")
@@ -39,6 +41,7 @@ public class AdminEntity {
     }
 
     public AdminEntity(long adminId,
+                       String uuid,
                        String firstName,
                        String lastName,
                        String username,
@@ -52,6 +55,7 @@ public class AdminEntity {
                        Time registeredTime,
                        String role) {
         this.adminId = adminId;
+        this.uuid = uuid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -71,6 +75,14 @@ public class AdminEntity {
 
     public void setAdminId(long adminId) {
         this.adminId = adminId;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getFirstName() {
@@ -165,6 +177,7 @@ public class AdminEntity {
     public String toString() {
         return "AdminEntity{" +
                 "adminId=" + adminId +
+                ", uuid='" + uuid + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +

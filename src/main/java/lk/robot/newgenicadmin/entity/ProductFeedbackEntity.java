@@ -25,7 +25,7 @@ public class ProductFeedbackEntity {
     @ManyToOne
     @JoinColumn(name = "fk_user_id")
     private UserEntity userEntity;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_product_id")
     private ProductEntity productEntity;
 

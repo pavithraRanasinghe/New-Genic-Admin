@@ -14,7 +14,7 @@ public class MainCategoryEntity {
     private String mainCategoryName;
     @Column
     private String mainCategoryDescription;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_admin_id")
     private AdminEntity adminEntity;
 

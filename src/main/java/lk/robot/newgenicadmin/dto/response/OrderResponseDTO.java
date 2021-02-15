@@ -21,7 +21,7 @@ public class OrderResponseDTO {
     private DeliveryDTO deliveryDTO;
     private UserAddressDTO shippingDetails;
     private UserAddressDTO billingDetail;
-    private List<OrderProductDTO> orderProductDTOList;
+    private List<ProductResponseDTO> orderProductDTOList;
     private OrderPaymentDTO orderPaymentDTO;
 
     public OrderResponseDTO() {
@@ -38,7 +38,7 @@ public class OrderResponseDTO {
                             DeliveryDTO deliveryDTO,
                             UserAddressDTO shippingDetails,
                             UserAddressDTO billingDetail,
-                            List<OrderProductDTO> orderProductDTOList,
+                            List<ProductResponseDTO> orderProductDTOList,
                             OrderPaymentDTO orderPaymentDTO) {
         this.orderId = orderId;
         this.orderDate = orderDate;
@@ -143,11 +143,11 @@ public class OrderResponseDTO {
         this.billingDetail = billingDetail;
     }
 
-    public List<OrderProductDTO> getOrderProductDTOList() {
+    public List<ProductResponseDTO> getOrderProductDTOList() {
         return orderProductDTOList;
     }
 
-    public void setOrderProductDTOList(List<OrderProductDTO> orderProductDTOList) {
+    public void setOrderProductDTOList(List<ProductResponseDTO> orderProductDTOList) {
         this.orderProductDTOList = orderProductDTOList;
     }
 

@@ -13,9 +13,9 @@ public interface ProductService {
 
     ResponseEntity<?> addProductBasic(BasicProductRequestDTO requestDTO);
 
-    ResponseEntity<?> addVariations(List<VariationRequestDTO> variationRequestDTOList);
+    ResponseEntity<?> addVariations(List<VariationRequestDTO> variationRequestDTOList,String productId);
 
-    ResponseEntity<?> addProductImage(ProductImageRequestDTO productImageRequestDTO, List<MultipartFile> multipartFiles);
+    ResponseEntity<?> addProductImage(long variationDetailId, List<MultipartFile> multipartFiles);
 
     ResponseEntity<?> addProductDetail(List<ProductPriceRequestDTO> productPriceRequestDTOList);
 

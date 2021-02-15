@@ -25,7 +25,7 @@ public class CategoryController {
     @PostMapping("/add")
     public ResponseEntity<?> addCategory(@RequestBody CategoryRequestDTO categoryRequestDTO, Principal principal){
         LOGGER.info("request - admin | addCategory | categoryRequest: {} | adminId: {}",categoryRequestDTO,principal.getName());
-        long adminId = Long.parseLong(principal.getName());
+        String adminId = principal.getName();
         ResponseEntity<?> category = categoryService.addCategory(categoryRequestDTO, adminId);
         LOGGER.info("response - admin | addCategory | category: {}",category.getBody());
         return category;

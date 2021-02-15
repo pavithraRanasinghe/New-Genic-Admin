@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface CategoryService {
 
-    ResponseEntity<?> addCategory(CategoryRequestDTO categoryRequestDTO,long adminId);
+    ResponseEntity<?> addCategory(CategoryRequestDTO categoryRequestDTO,String adminId);
 
     ResponseEntity<?> getCategory();
 }

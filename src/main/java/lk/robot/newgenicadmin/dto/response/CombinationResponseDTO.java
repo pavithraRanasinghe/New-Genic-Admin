@@ -1,6 +1,5 @@
 package lk.robot.newgenicadmin.dto.response;
 
-import lk.robot.newgenicadmin.dto.VariationDTO;
 import lk.robot.newgenicadmin.dto.VariationDetailDTO;
 
 import java.util.List;

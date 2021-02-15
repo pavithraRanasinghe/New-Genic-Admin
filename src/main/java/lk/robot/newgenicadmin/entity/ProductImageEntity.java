@@ -12,7 +12,7 @@ public class ProductImageEntity {
     private long productImageId;
     @Column
     private String url;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_variation_detail_id")
     private VariationDetailEntity variationDetailEntity;
 

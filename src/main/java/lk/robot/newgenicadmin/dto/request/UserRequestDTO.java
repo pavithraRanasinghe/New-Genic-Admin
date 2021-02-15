@@ -9,16 +9,14 @@ public class UserRequestDTO {
     @NotEmpty(message = "User name cannot be null or empty")
     @NotNull(message = "User name cannot be null or empty")
     private String userName;
-
     private String nic;
     private String gender;
     @NotEmpty(message = "Email cannot be null or empty")
     @NotNull(message = "Email cannot be null or empty")
     @Email(message = "Please input valid email address")
     private String gmail;
-    @Pattern(regexp = "[0-9]{9,10}",message = "Please input valid mobile number")
+    @Pattern(regexp = "[0-9]{9,10}", message = "Please input valid mobile number")
     private String mobile;
-    private String profilePicture;
     @Size(min = 7, message = "Password should have 8 characters")
     @NotEmpty(message = "Password cannot be null or empty")
     @NotNull(message = "Password cannot be null or empty")
@@ -29,17 +27,12 @@ public class UserRequestDTO {
 
     public UserRequestDTO(String firstName,
                           String lastName,
-                          @NotNull(message = "User name required")
-                                  String userName,
+                          String userName,
                           String nic,
                           String gender,
-                          @NotNull(message = "Email required.cannot be blank")
-                          @Email(message = "Please input valid email address")
-                                  String gmail,
+                          String gmail,
                           String mobile,
-                          String profilePicture,
-                          @NotNull(message = "Password shouldn't empty")
-                                  String password) {
+                          String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;
@@ -47,7 +40,6 @@ public class UserRequestDTO {
         this.gender = gender;
         this.gmail = gmail;
         this.mobile = mobile;
-        this.profilePicture = profilePicture;
         this.password = password;
     }
 
@@ -107,14 +99,6 @@ public class UserRequestDTO {
         this.mobile = mobile;
     }
 
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -133,7 +117,6 @@ public class UserRequestDTO {
                 ", gender='" + gender + '\'' +
                 ", gmail='" + gmail + '\'' +
                 ", mobile='" + mobile + '\'' +
-                ", profilePicture='" + profilePicture + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

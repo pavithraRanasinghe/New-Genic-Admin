@@ -19,7 +19,7 @@ public class InvoiceResponseDTO {
     private double totalPrice;
     private UserAddressDTO billingDetails;
     private UserAddressDTO shippingDetails;
-    List<ProductDTO> productDTOList;
+    List<ProductResponseDTO> productDTOList;
 
     public InvoiceResponseDTO() {
     }
@@ -34,7 +34,7 @@ public class InvoiceResponseDTO {
                               double totalPrice,
                               UserAddressDTO billingDetails,
                               UserAddressDTO shippingDetails,
-                              List<ProductDTO> productDTOList) {
+                              List<ProductResponseDTO> productDTOList) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.orderTime = orderTime;
@@ -128,11 +128,11 @@ public class InvoiceResponseDTO {
         this.shippingDetails = shippingDetails;
     }
 
-    public List<ProductDTO> getProductDTOList() {
+    public List<ProductResponseDTO> getProductDTOList() {
         return productDTOList;
     }
 
-    public void setProductDTOList(List<ProductDTO> productDTOList) {
+    public void setProductDTOList(List<ProductResponseDTO> productDTOList) {
         this.productDTOList = productDTOList;
     }
 

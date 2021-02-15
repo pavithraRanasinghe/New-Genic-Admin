@@ -41,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
     private ModelMapper modelMapper;
     @Value("${application.bucket.name}")
     private String bucketName;
-    @Value(value = "aws.folder.product")
+    @Value("${aws.folder.product}")
     private String folder;
 
     @Autowired
@@ -98,97 +98,117 @@ public class ProductServiceImpl implements ProductService {
                 return new ResponseEntity<>("Product details not found", HttpStatus.BAD_GATEWAY);
             }
         } catch (Exception e) {
-            throw new CustomException("Basic product add Failed");
+            throw new CustomException(e.getMessage());
         }
     }
 
     @Override
-    public ResponseEntity<?> addVariations(List<VariationRequestDTO> variationRequestDTOList) {
+    public ResponseEntity<?> addVariations(List<VariationRequestDTO> variationRequestDTOList, String productId) {
         try {
             if (!variationRequestDTOList.isEmpty()) {
-                List<List<VariationDetailDTO>> places = new ArrayList<>();
-                for (VariationRequestDTO variationRequestDTO :
-                        variationRequestDTOList) {
-                    List<VariationDetailDTO> variationCombinationType = new ArrayList<>();
-                    VariationEntity newVariation = new VariationEntity();
-                    newVariation.setVariationName(variationRequestDTO.getVariationName());
-                    newVariation.setVariationDescription(variationRequestDTO.getVariationDescription());
+                Optional<ProductEntity> productEntity = productRepository.findByUuid(productId);
+                if (productEntity.isPresent()) {
+                    List<List<VariationDetailDTO>> places = new ArrayList<>();
+                    for (VariationRequestDTO variationRequestDTO :
+                            variationRequestDTOList) {
+                        VariationEntity existingVariation = variationRepository.findByProductEntityAndAndVariationName(productEntity.get(), variationRequestDTO.getVariationName());
+                        List<VariationDetailDTO> variationCombinationType = new ArrayList<>();
+                        if (existingVariation == null) {
+                            VariationEntity newVariation = new VariationEntity();
+                            newVariation.setVariationName(variationRequestDTO.getVariationName());
+                            newVariation.setVariationDescription(variationRequestDTO.getVariationDescription());
+                            newVariation.setProductEntity(productEntity.get());
 
-                    VariationEntity variationEntity = variationRepository.save(newVariation);
+                            VariationEntity variationEntity = variationRepository.save(newVariation);
 
-                    for (String value :
-                            variationRequestDTO.getValueList()) {
-                        VariationDetailEntity newVariationDetail = new VariationDetailEntity();
-                        newVariationDetail.setValue(value);
-                        newVariationDetail.setVariationEntity(variationEntity);
+                            for (String value :
+                                    variationRequestDTO.getValueList()) {
+                                VariationDetailEntity newVariationDetail = new VariationDetailEntity();
+                                newVariationDetail.setValue(value);
+                                newVariationDetail.setVariationEntity(variationEntity);
 
-                        VariationDetailEntity detailEntity = variationDetailRepository.save(newVariationDetail);
-                        variationCombinationType.add(modelMapper.map(detailEntity, VariationDetailDTO.class));
+                                VariationDetailEntity detailEntity = variationDetailRepository.save(newVariationDetail);
+                                variationCombinationType.add(modelMapper.map(detailEntity, VariationDetailDTO.class));
+                            }
+
+                            places.add(variationCombinationType);
+                        } else {
+                            for (String value :
+                                    variationRequestDTO.getValueList()) {
+                                VariationDetailEntity existingVariationDetail = variationDetailRepository.findByValueAndVariationEntity(value, existingVariation);
+                                if (existingVariationDetail == null){
+                                    VariationDetailEntity newVariationDetail = new VariationDetailEntity();
+                                    newVariationDetail.setValue(value);
+                                    newVariationDetail.setVariationEntity(existingVariation);
+
+                                    VariationDetailEntity detailEntity = variationDetailRepository.save(newVariationDetail);
+                                    variationCombinationType.add(modelMapper.map(detailEntity, VariationDetailDTO.class));
+                                }else{
+                                    variationCombinationType.add(modelMapper.map(existingVariationDetail,VariationDetailDTO.class));
+                                }
+                            }
+                            places.add(variationCombinationType);
+                        }
                     }
+                    LinkedList<VariationDetailDTO> tokens = new LinkedList<>();
+                    List<List<VariationDetailDTO>> combinations = combine(places, 0, tokens);
 
-                    places.add(variationCombinationType);
-                }
-                LinkedList<VariationDetailDTO> tokens = new LinkedList<>();
-                List<List<VariationDetailDTO>> combinations = combine(places, 0, tokens);
+                    List<CombinationResponseDTO> combinationList = new ArrayList<>();
+                    for (List<VariationDetailDTO> variationDetailList :
+                            combinations) {
+                        List<VariationDetailDTO> variationList = new ArrayList<>();
+                        CombinationEntity combinationEntity = new CombinationEntity();
+                        CombinationEntity newCombination = combinationRepository.save(combinationEntity);
+                        CombinationResponseDTO combinationResponseDTO = new CombinationResponseDTO();
+                        combinationResponseDTO.setCombinationId(newCombination.getCombinationId());
 
-                List<CombinationResponseDTO> combinationList = new ArrayList<>();
-                for (List<VariationDetailDTO> variationDetailList :
-                        combinations) {
-                    List<VariationDetailDTO> variationList = new ArrayList<>();
-                    CombinationEntity combinationEntity = new CombinationEntity();
-                    CombinationEntity newCombination = combinationRepository.save(combinationEntity);
-                    CombinationResponseDTO combinationResponseDTO = new CombinationResponseDTO();
-                    combinationResponseDTO.setCombinationId(newCombination.getCombinationId());
-                    VariationCombinationDetailEntity variationCombinationDetailEntity = new VariationCombinationDetailEntity();
-
-                    for (VariationDetailDTO variationDetailDTO :
-                            variationDetailList) {
-                        Optional<VariationDetailEntity> variationDetailEntity = variationDetailRepository.findById(variationDetailDTO.getVariationDetailId());
-                        variationCombinationDetailEntity.setCombinationEntity(newCombination);
-                        variationCombinationDetailEntity.setVariationDetailEntity(variationDetailEntity.get());
-                        variationList.add(modelMapper.map(variationDetailEntity.get(), VariationDetailDTO.class));
-                        variationCombinationDetailRepository.save(variationCombinationDetailEntity);
+                        for (VariationDetailDTO variationDetailDTO :
+                                variationDetailList) {
+                            VariationCombinationDetailEntity variationCombinationDetailEntity = new VariationCombinationDetailEntity();
+                            Optional<VariationDetailEntity> variationDetailEntity = variationDetailRepository.findById(variationDetailDTO.getVariationDetailId());
+                            variationCombinationDetailEntity.setCombinationEntity(newCombination);
+                            variationCombinationDetailEntity.setVariationDetailEntity(variationDetailEntity.get());
+                            variationList.add(modelMapper.map(variationDetailEntity.get(), VariationDetailDTO.class));
+                            variationCombinationDetailRepository.save(variationCombinationDetailEntity);
+                        }
+                        combinationResponseDTO.setVariationList(variationList);
+                        combinationList.add(combinationResponseDTO);
                     }
-                    combinationResponseDTO.setVariationList(variationList);
-                    combinationList.add(combinationResponseDTO);
-                }
-
-                if (!combinationList.isEmpty()) {
-                    return new ResponseEntity<>(combinationList, HttpStatus.OK);
+                    if (!combinationList.isEmpty()) {
+                        return new ResponseEntity<>(combinationList, HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("Combinations not created", HttpStatus.EXPECTATION_FAILED);
+                    }
                 } else {
-                    return new ResponseEntity<>("Combinations not created", HttpStatus.EXPECTATION_FAILED);
+                    return new ResponseEntity<>("Product not found", HttpStatus.BAD_REQUEST);
                 }
             } else {
                 return new ResponseEntity<>("variations not found", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            throw new CustomException("Variations add failed");
+            throw new CustomException(e.getMessage());
         }
     }
 
     @Override
-    public ResponseEntity<?> addProductImage(ProductImageRequestDTO productImageRequestDTO, List<MultipartFile> multipartFiles) {
+    public ResponseEntity<?> addProductImage(long variationDetailId, List<MultipartFile> multipartFiles) {
         try {
-            if (productImageRequestDTO != null) {
-                Optional<VariationEntity> variationEntity = variationRepository.findById(productImageRequestDTO.getVariationId());
-                if (variationEntity.isPresent()) {
-                    VariationDetailEntity variationDetailEntity = variationDetailRepository.findByValueAndVariationEntity(productImageRequestDTO.getValue(), variationEntity.get());
+            if (variationDetailId != 0) {
+                    Optional<VariationDetailEntity> variationDetailEntity = variationDetailRepository.findById(variationDetailId);
                     if (variationDetailEntity != null) {
                         for (MultipartFile multipartFile :
                                 multipartFiles) {
                             uploadFile(multipartFile);
                             ProductImageEntity productImageEntity = new ProductImageEntity();
                             productImageEntity.setUrl(getFileUrl(multipartFile.getOriginalFilename()));
-                            productImageEntity.setVariationDetailEntity(variationDetailEntity);
+                            productImageEntity.setVariationDetailEntity(variationDetailEntity.get());
                             productImageRepository.save(productImageEntity);
                         }
                         return new ResponseEntity<>("Images uploaded successful", HttpStatus.OK);
                     } else {
                         return new ResponseEntity<>("Value not found", HttpStatus.BAD_REQUEST);
                     }
-                } else {
-                    return new ResponseEntity<>("Variation not found", HttpStatus.BAD_REQUEST);
-                }
+
             } else {
                 return new ResponseEntity<>("Image data not found", HttpStatus.BAD_REQUEST);
             }
@@ -235,9 +255,9 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<?> removeBasicProductDetail(String uuid) {
         try {
             if (uuid != null) {
-                ProductEntity productEntity = productRepository.findByUuid(uuid);
-                if (productEntity != null) {
-                    productRepository.delete(productEntity);
+                Optional<ProductEntity> productEntity = productRepository.findByUuid(uuid);
+                if (productEntity.isPresent()) {
+                    productRepository.delete(productEntity.get());
                     return new ResponseEntity<>("Product deleted", HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>("Product not found", HttpStatus.BAD_REQUEST);

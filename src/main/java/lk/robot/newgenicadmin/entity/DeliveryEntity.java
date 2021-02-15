@@ -35,7 +35,7 @@ public class DeliveryEntity {
     private String registrationNumber;
     @Column
     private boolean active;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_admin_id")
     private AdminEntity adminEntity;
     @OneToMany(mappedBy = "deliveryEntity",fetch = FetchType.LAZY)

@@ -14,7 +14,6 @@ public class EntityToDto {
         adminEntity.setGender(userRequestDTO.getGender());
         adminEntity.setGmail(userRequestDTO.getGmail());
         adminEntity.setMobile(userRequestDTO.getMobile());
-        adminEntity.setProfilePicture(userRequestDTO.getProfilePicture());
 
         return adminEntity;
     }
