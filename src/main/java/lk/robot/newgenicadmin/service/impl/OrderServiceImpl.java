@@ -39,12 +39,14 @@ public class OrderServiceImpl implements OrderService {
     public OrderServiceImpl(ModelMapper modelMapper,
                             OrderRepository orderRepository,
                             OrderDetailRepository orderDetailRepository,
+                            PaymentRepository paymentRepository,
                             VariationCombinationDetailRepository variationCombinationDetailRepository,
                             VariationRepository variationRepository,
                             VariationDetailRepository variationDetailRepository) {
         this.modelMapper = modelMapper;
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
+        this.paymentRepository = paymentRepository;
         this.variationCombinationDetailRepository = variationCombinationDetailRepository;
         this.variationRepository = variationRepository;
         this.variationDetailRepository = variationDetailRepository;
@@ -54,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     public ResponseEntity<?> getOrders(String type) {
         try {
             String orderType = checkOrderType(type);
-            if (orderType.equals(null)) {
+            if (orderType == null) {
                 return new ResponseEntity<>("Invalid order type", HttpStatus.BAD_REQUEST);
             }
             List<OrderEntity> orderList = orderRepository.findByStatus(orderType);
@@ -66,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
                     List<ProductResponseDTO> productDTOList = new ArrayList<>();
                     for (OrderDetailEntity orderDetailEntity :
                             orderDetailList) {
-                        productDTOList.add(orderDetailEntityToDTO(orderDetailEntity));
+                        productDTOList.add(setProductDetail(orderDetailEntity));
                     }
                     OrderResponseDTO orderResponseDTO = orderEntityToDTO(orderEntity, productDTOList);
                     responseList.add(orderResponseDTO);
@@ -83,17 +85,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResponseEntity<?> shipOrder(ShipOrderRequestDTO shipOrderRequestDTO) {
         try {
-            if (!shipOrderRequestDTO.equals(null)) {
+            if (shipOrderRequestDTO != null) {
                 OrderEntity order = orderRepository.findByOrderUuid(shipOrderRequestDTO.getOrderId());
                 if (order != null) {
-                    if (order.getStatus() == OrderStatus.PENDING.toString()) {
+                    if (order.getStatus().equals(OrderStatus.PENDING.toString())) {
                         order.setStatus(OrderStatus.SHIPPED.toString());
                         order.setPickUpDate(DateConverter.localDateToSql(LocalDate.now()));
                         order.setPickUpTime(DateConverter.localTimeToSql(LocalTime.now()));
                         order.setTrackingNumber(shipOrderRequestDTO.getTrackingNumber());
 
                         OrderEntity save = orderRepository.save(order);
-                        if (save.equals(null)) {
+                        if (save == null) {
                             return new ResponseEntity<>("Order not shipped", HttpStatus.BAD_REQUEST);
                         }
                         return new ResponseEntity<>("Order shipped", HttpStatus.OK);
@@ -116,13 +118,14 @@ public class OrderServiceImpl implements OrderService {
         try {
             if (orderId != null) {
                 OrderEntity order = orderRepository.findByOrderUuid(orderId);
-                if (order != null && (order.getStatus() == OrderStatus.SHIPPED.toString())) {
+                if (order != null && (order.getStatus().equals(OrderStatus.SHIPPED.toString()))) {
                     order.setStatus(OrderStatus.DELIVERED.toString());
                     OrderEntity save = orderRepository.save(order);
-                    if (save.equals(null)) {
+                    if (save == null) {
                         return new ResponseEntity<>("Order not delivered", HttpStatus.BAD_REQUEST);
                     }
-                    paymentRepository.save(setPaymentDetails(order));
+                    PaymentEntity paymentEntity = setPaymentDetails(order);
+                    paymentRepository.save(paymentEntity);
 
                     return new ResponseEntity<>("Order delivered", HttpStatus.OK);
                 } else {
@@ -154,17 +157,9 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private ProductResponseDTO orderDetailEntityToDTO(OrderDetailEntity orderDetailEntity) {
-
-        ProductResponseDTO productResponseDTO = setProductDetails(getProductFromCombination(orderDetailEntity.getCombinationEntity()));
-        productResponseDTO.setDiscount(getProductFromCombination(orderDetailEntity.getCombinationEntity()).getDealEntity().getDiscount());
-        productResponseDTO.setQty(orderDetailEntity.getQuantity());
-        productResponseDTO.setProductOrderPrice(orderDetailEntity.getOrderPrice());
-        return productResponseDTO;
-    }
-
     private OrderResponseDTO orderEntityToDTO(OrderEntity orderEntity, List<ProductResponseDTO> productDTOList) {
         OrderResponseDTO orderResponseDTO = modelMapper.map(orderEntity, OrderResponseDTO.class);
+        orderResponseDTO.setOrderId(orderEntity.getOrderUuid());
         orderResponseDTO.setUserDTO(modelMapper.map(orderEntity.getUserEntity(), UserDTO.class));
         orderResponseDTO.setDeliveryDTO(modelMapper.map(orderEntity.getDeliveryEntity(), DeliveryDTO.class));
         orderResponseDTO.setShippingDetails(modelMapper.map(orderEntity.getShippingDetails(), UserAddressDTO.class));
@@ -219,8 +214,7 @@ public class OrderServiceImpl implements OrderService {
         List<ProductResponseDTO> productList = new ArrayList<>();
         for (OrderDetailEntity orderDetailEntity :
                 orderDetailList) {
-            ProductEntity product = getProductFromCombination(orderDetailEntity.getCombinationEntity());
-            ProductResponseDTO productResponseDTO = setProductDetails(product);
+            ProductResponseDTO productResponseDTO = setProductDetail(orderDetailEntity);
             productList.add(productResponseDTO);
         }
         return productList;
@@ -240,61 +234,101 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private ProductResponseDTO setProductDetails(ProductEntity productEntity) {
-        List<CombinationDTO> combinationList = new ArrayList<>();
-        List<VariationEntity> variationList = variationRepository.findByProductEntity(productEntity);
-        for (VariationEntity variationEntity :
-                variationList) {
-            List<VariationDetailEntity> byVariationEntity = variationDetailRepository.findByVariationEntity(variationEntity);
-            for (VariationDetailEntity variationDetailEntity :
-                    byVariationEntity) {
+//    private ProductResponseDTO setProductDetails(ProductEntity productEntity) {
+//        List<CombinationDTO> combinationList = new ArrayList<>();
+//        List<VariationEntity> variationList = variationRepository.findByProductEntity(productEntity);
+//        for (VariationEntity variationEntity :
+//                variationList) {
+//            List<VariationDetailEntity> byVariationEntity = variationDetailRepository.findByVariationEntity(variationEntity);
+//            for (VariationDetailEntity variationDetailEntity :
+//                    byVariationEntity) {
+//
+//                List<VariationCombinationDetailEntity> variationCombinationDetailList = variationCombinationDetailRepository.findByVariationDetailEntity(variationDetailEntity);
+//
+//                for (VariationCombinationDetailEntity variationCombinationDetailEntity :
+//                        variationCombinationDetailList) {
+//                    CombinationEntity combinationEntity = variationCombinationDetailEntity.getCombinationEntity();
+//
+//                    CombinationDTO combinationDTO = new CombinationDTO();
+//                    combinationDTO.setCombinationId(combinationEntity.getCombinationId());
+//                    combinationDTO.setStock(combinationEntity.getStock());
+//                    combinationDTO.setWeight(combinationEntity.getWeight());
+//                    combinationDTO.setSalePrice(combinationEntity.getSalePrice());
+//                    combinationDTO.setRetailPrice(combinationEntity.getRetailPrice());
+//
+//                    VariationDTO variationDTO = new VariationDTO();
+//                    VariationDetailEntity variationDetail = variationCombinationDetailEntity.getVariationDetailEntity();
+//                    variationDTO.setVariationDetailId(variationDetail.getVariationDetailId());
+//                    variationDTO.setValue(variationDetail.getValue());
+//                    variationDTO.setVariationId(variationDetail.getVariationEntity().getVariationId());
+//                    variationDTO.setVariationName(variationDetail.getVariationEntity().getVariationName());
+//
+//                    if (combinationList.isEmpty()){
+//                        combinationList.add(combinationDTO);
+//                    }
+//
+//                    for (CombinationDTO combination :
+//                            combinationList) {
+//                        if (combination.getCombinationId() == combinationEntity.getCombinationId()){
+//                            combination.getVariationList().add(variationDTO);
+//                        }else{
+//                            List<VariationDTO> allVariationList = new ArrayList<>();
+//                            allVariationList.add(variationDTO);
+//                            combinationDTO.setVariationList(allVariationList);
+//                            combinationList.add(combinationDTO);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+//        productResponseDTO.setUuid(productEntity.getUuid());
+//        productResponseDTO.setName(productEntity.getName());
+//        productResponseDTO.setDescription(productEntity.getDescription());
+//        productResponseDTO.setBrand(productEntity.getBrand());
+//        productResponseDTO.setFreeShipping(productEntity.isFreeShipping());
+//        productResponseDTO.setVariationList(combinationList);
+//
+//        return productResponseDTO;
+//    }
 
-                List<VariationCombinationDetailEntity> variationCombinationDetailList = variationCombinationDetailRepository.findByVariationDetailEntity(variationDetailEntity);
-
-                for (VariationCombinationDetailEntity variationCombinationDetailEntity :
-                        variationCombinationDetailList) {
-                    CombinationEntity combinationEntity = variationCombinationDetailEntity.getCombinationEntity();
-
-                    CombinationDTO combinationDTO = new CombinationDTO();
-                    combinationDTO.setCombinationId(combinationEntity.getCombinationId());
-                    combinationDTO.setStock(combinationEntity.getStock());
-                    combinationDTO.setWeight(combinationEntity.getWeight());
-                    combinationDTO.setSalePrice(combinationEntity.getSalePrice());
-                    combinationDTO.setRetailPrice(combinationEntity.getRetailPrice());
-
-                    VariationDTO variationDTO = new VariationDTO();
-                    VariationDetailEntity variationDetail = variationCombinationDetailEntity.getVariationDetailEntity();
-                    variationDTO.setVariationDetailId(variationDetail.getVariationDetailId());
-                    variationDTO.setValue(variationDetail.getValue());
-                    variationDTO.setVariationId(variationDetail.getVariationEntity().getVariationId());
-                    variationDTO.setVariationName(variationDetail.getVariationEntity().getVariationName());
-
-                    if (combinationList.isEmpty()){
-                        combinationList.add(combinationDTO);
-                    }
-
-                    for (CombinationDTO combination :
-                            combinationList) {
-                        if (combination.getCombinationId() == combinationEntity.getCombinationId()){
-                            combination.getVariationList().add(variationDTO);
-                        }else{
-                            List<VariationDTO> allVariationList = new ArrayList<>();
-                            allVariationList.add(variationDTO);
-                            combinationDTO.setVariationList(allVariationList);
-                            combinationList.add(combinationDTO);
-                        }
-                    }
-                }
-            }
-        }
+    private ProductResponseDTO setProductDetail(OrderDetailEntity orderDetailEntity){
+        ProductEntity productEntity = getProductFromCombination(orderDetailEntity.getCombinationEntity());
         ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+
         productResponseDTO.setUuid(productEntity.getUuid());
+        productResponseDTO.setProductCode(productEntity.getProductCode());
         productResponseDTO.setName(productEntity.getName());
         productResponseDTO.setDescription(productEntity.getDescription());
         productResponseDTO.setBrand(productEntity.getBrand());
+        productResponseDTO.setQty(orderDetailEntity.getQuantity());
+        productResponseDTO.setProductOrderPrice(orderDetailEntity.getOrderPrice());
+        if (productEntity.getDealEntity() != null){
+            productResponseDTO.setDiscount(productEntity.getDealEntity().getDiscount());
+        }
         productResponseDTO.setFreeShipping(productEntity.isFreeShipping());
-        productResponseDTO.setVariationList(combinationList);
+
+        CombinationDTO combinationDTO = modelMapper.map(orderDetailEntity.getCombinationEntity(), CombinationDTO.class);
+        List<VariationDTO> variationList = setVariationsFromCombination(orderDetailEntity.getCombinationEntity());
+        combinationDTO.setVariationList(variationList);
+        productResponseDTO.setCombinationDTO(combinationDTO);
 
         return productResponseDTO;
     }
+
+    private List<VariationDTO> setVariationsFromCombination(CombinationEntity combinationEntity){
+        List<VariationDTO> variationList = new ArrayList<>();
+        List<VariationCombinationDetailEntity> variationCombinationList = variationCombinationDetailRepository.findByCombinationEntity(combinationEntity);
+        for (VariationCombinationDetailEntity variationCombinationDetailEntity :
+                variationCombinationList) {
+            variationList.add(new VariationDTO(
+                    variationCombinationDetailEntity.getVariationDetailEntity().getVariationEntity().getVariationId(),
+                    variationCombinationDetailEntity.getVariationDetailEntity().getVariationEntity().getVariationName(),
+                    variationCombinationDetailEntity.getVariationDetailEntity().getVariationDetailId(),
+                    variationCombinationDetailEntity.getVariationDetailEntity().getValue()
+            ));
+        }
+        return variationList;
+    }
+
 }

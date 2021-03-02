@@ -1,10 +1,13 @@
 package lk.robot.newgenicadmin.service.impl;
 
+import lk.robot.newgenicadmin.dto.CombinationDTO;
 import lk.robot.newgenicadmin.dto.ProductDTO;
 import lk.robot.newgenicadmin.dto.ReorderPriceWeightDTO;
 import lk.robot.newgenicadmin.dto.ReturnDetailDTO;
 import lk.robot.newgenicadmin.dto.request.ReorderRequest;
+import lk.robot.newgenicadmin.dto.response.ProductResponseDTO;
 import lk.robot.newgenicadmin.dto.response.ReturnResponseDTO;
+import lk.robot.newgenicadmin.dto.response.VariationDTO;
 import lk.robot.newgenicadmin.entity.*;
 import lk.robot.newgenicadmin.enums.OrderStatus;
 import lk.robot.newgenicadmin.enums.ReturnAction;
@@ -39,6 +42,7 @@ public class ReturnServiceImpl implements ReturnService {
     private OrderRepository orderRepository;
     private PaymentRepository paymentRepository;
     private DeliveryCostRepository deliveryCostRepository;
+    private VariationCombinationDetailRepository variationCombinationDetailRepository;
 
     @Autowired
     public ReturnServiceImpl(ModelMapper modelMapper,
@@ -47,7 +51,8 @@ public class ReturnServiceImpl implements ReturnService {
                              ReturnDetailRepository returnDetailRepository,
                              OrderRepository orderRepository,
                              PaymentRepository paymentRepository,
-                             DeliveryCostRepository deliveryCostRepository) {
+                             DeliveryCostRepository deliveryCostRepository,
+                             VariationCombinationDetailRepository variationCombinationDetailRepository) {
         this.modelMapper = modelMapper;
         this.returnRepository = returnRepository;
         this.orderDetailRepository = orderDetailRepository;
@@ -55,6 +60,7 @@ public class ReturnServiceImpl implements ReturnService {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.deliveryCostRepository = deliveryCostRepository;
+        this.variationCombinationDetailRepository = variationCombinationDetailRepository;
     }
 
     @Override
@@ -70,7 +76,7 @@ public class ReturnServiceImpl implements ReturnService {
                     List<ReturnDetailDTO> returnDetailList = new ArrayList<>();
                     for (ReturnDetailEntity returnDetailEntity :
                             returnDetails) {
-//                        returnDetailList.add(setProductDetail(returnDetailEntity));
+                        returnDetailList.add(setProductDetail(returnDetailEntity));
                     }
                     returnResponseList.add(setReturnDetails(returnEntity, returnDetailList));
                 }
@@ -161,13 +167,13 @@ public class ReturnServiceImpl implements ReturnService {
         );
     }
 
-//    private ReturnDetailDTO setProductDetail(ReturnDetailEntity returnDetail) {
-//        return new ReturnDetailDTO(
-//                returnDetail.getReason(),
-//                returnDetail.getReturnQty(),
-//                modelMapper.map(returnDetail.getOrderDetailEntity().getProductEntity(), ProductDTO.class)
-//        );
-//    }
+    private ReturnDetailDTO setProductDetail(ReturnDetailEntity returnDetail) {
+        return new ReturnDetailDTO(
+                returnDetail.getReason(),
+                returnDetail.getReturnQty(),
+                setProductDetailFromReturnDetail(returnDetail)
+        );
+    }
 
     private double calculateRefund(PaymentEntity paymentEntity) {
         return paymentEntity.getOrderPrice() + paymentEntity.getDeliveryPrice();
@@ -231,5 +237,58 @@ public class ReturnServiceImpl implements ReturnService {
             deliveryPrice += (districtPrice.getCostPerExtra() * round);
         }
         return new ReorderPriceWeightDTO(totalWeight, totalPrice, deliveryPrice);
+    }
+
+    private ProductResponseDTO setProductDetailFromReturnDetail(ReturnDetailEntity returnDetail){
+        ProductEntity productEntity = getProductFromCombination(returnDetail.getOrderDetailEntity().getCombinationEntity());
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+
+        productResponseDTO.setUuid(productEntity.getUuid());
+        productResponseDTO.setProductCode(productEntity.getProductCode());
+        productResponseDTO.setName(productEntity.getName());
+        productResponseDTO.setDescription(productEntity.getDescription());
+        productResponseDTO.setBrand(productEntity.getBrand());
+        productResponseDTO.setQty(returnDetail.getOrderDetailEntity().getQuantity());
+        productResponseDTO.setProductOrderPrice(returnDetail.getOrderDetailEntity().getOrderPrice());
+        if (productEntity.getDealEntity() != null){
+            productResponseDTO.setDiscount(productEntity.getDealEntity().getDiscount());
+        }
+        productResponseDTO.setFreeShipping(productEntity.isFreeShipping());
+
+        CombinationDTO combinationDTO = modelMapper.map(returnDetail.getOrderDetailEntity().getCombinationEntity(), CombinationDTO.class);
+        List<VariationDTO> variationList = setVariationsFromCombination(returnDetail.getOrderDetailEntity().getCombinationEntity());
+        combinationDTO.setVariationList(variationList);
+        productResponseDTO.setCombinationDTO(combinationDTO);
+
+        return productResponseDTO;
+    }
+
+    private ProductEntity getProductFromCombination(CombinationEntity combinationEntity) {
+        List<VariationCombinationDetailEntity> variationCombinationList = variationCombinationDetailRepository.findByCombinationEntity(combinationEntity);
+        if (!variationCombinationList.isEmpty()) {
+            ProductEntity productEntity = new ProductEntity();
+            for (VariationCombinationDetailEntity variationCombinationDetailEntity :
+                    variationCombinationList) {
+                productEntity = variationCombinationDetailEntity.getVariationDetailEntity().getVariationEntity().getProductEntity();
+            }
+            return productEntity;
+        } else {
+            return null;
+        }
+    }
+
+    private List<VariationDTO> setVariationsFromCombination(CombinationEntity combinationEntity){
+        List<VariationDTO> variationList = new ArrayList<>();
+        List<VariationCombinationDetailEntity> variationCombinationList = variationCombinationDetailRepository.findByCombinationEntity(combinationEntity);
+        for (VariationCombinationDetailEntity variationCombinationDetailEntity :
+                variationCombinationList) {
+            variationList.add(new VariationDTO(
+                    variationCombinationDetailEntity.getVariationDetailEntity().getVariationEntity().getVariationId(),
+                    variationCombinationDetailEntity.getVariationDetailEntity().getVariationEntity().getVariationName(),
+                    variationCombinationDetailEntity.getVariationDetailEntity().getVariationDetailId(),
+                    variationCombinationDetailEntity.getVariationDetailEntity().getValue()
+            ));
+        }
+        return variationList;
     }
 }

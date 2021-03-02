@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface DeliveryService {
 
-    ResponseEntity<?> addDelivery(DeliveryRequestDTO deliveryRequestDTO,long adminId);
+    ResponseEntity<?> addDelivery(DeliveryRequestDTO deliveryRequestDTO,String adminId);
 
     ResponseEntity<?> getDelivery();
 }

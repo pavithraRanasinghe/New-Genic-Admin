@@ -13,7 +13,7 @@ public class DeliveryRequestDTO {
     private String mobile;
     private String webSite;
     private String regNo;
-    private List<DeliveryCostDTO> deliveryCostDTOList;
+    private List<DeliveryCostRequestDTO> deliveryCostList;
 
     public DeliveryRequestDTO() {
     }
@@ -24,14 +24,14 @@ public class DeliveryRequestDTO {
                               String mobile,
                               String webSite,
                               String regNo,
-                              List<DeliveryCostDTO> deliveryCostDTOList) {
+                              List<DeliveryCostRequestDTO> deliveryCostList) {
         this.name = name;
         this.address = address;
         this.gmail = gmail;
         this.mobile = mobile;
         this.webSite = webSite;
         this.regNo = regNo;
-        this.deliveryCostDTOList = deliveryCostDTOList;
+        this.deliveryCostList = deliveryCostList;
     }
 
     public String getName() {
@@ -82,12 +82,12 @@ public class DeliveryRequestDTO {
         this.regNo = regNo;
     }
 
-    public List<DeliveryCostDTO> getDeliveryCostDTOList() {
-        return deliveryCostDTOList;
+    public List<DeliveryCostRequestDTO> getDeliveryCostList() {
+        return deliveryCostList;
     }
 
-    public void setDeliveryCostDTOList(List<DeliveryCostDTO> deliveryCostDTOList) {
-        this.deliveryCostDTOList = deliveryCostDTOList;
+    public void setDeliveryCostList(List<DeliveryCostRequestDTO> deliveryCostList) {
+        this.deliveryCostList = deliveryCostList;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class DeliveryRequestDTO {
                 ", mobile='" + mobile + '\'' +
                 ", webSite='" + webSite + '\'' +
                 ", regNo='" + regNo + '\'' +
-                ", deliveryCostDTOList=" + deliveryCostDTOList +
+                ", deliveryCostList=" + deliveryCostList +
                 '}';
     }
 }

@@ -43,6 +43,7 @@ public class FinanceServiceImpl implements FinanceService {
                 for (OrderEntity orderEntity:
                      orderList) {
                     financeResponseDTO.setOrderPrices(financeResponseDTO.getOrderPrices() + orderEntity.getPaymentEntity().getOrderPrice());
+                    financeResponseDTO.setBuyingPrices(financeResponseDTO.getBuyingPrices() + orderEntity.getPaymentEntity().getBuyingPrice());
                     financeResponseDTO.setDeliveryPrices(financeResponseDTO.getDeliveryPrices() + orderEntity.getPaymentEntity().getDeliveryPrice());
                     financeResponseDTO.setDiscounts(financeResponseDTO.getDiscounts() + orderEntity.getPaymentEntity().getDiscountPrice());
                     financeResponseDTO.setRefund(financeResponseDTO.getRefund() + orderEntity.getPaymentEntity().getRefund());
@@ -60,7 +61,7 @@ public class FinanceServiceImpl implements FinanceService {
                 return new ResponseEntity<>("No orders found", HttpStatus.BAD_GATEWAY);
             }
         }catch (Exception e){
-            throw new CustomException("Failed to find profit");
+            throw new CustomException(e.getMessage());
         }
     }
 

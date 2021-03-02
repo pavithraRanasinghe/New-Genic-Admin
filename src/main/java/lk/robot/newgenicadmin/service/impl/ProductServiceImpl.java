@@ -87,7 +87,7 @@ public class ProductServiceImpl implements ProductService {
 
                     ProductEntity save = productRepository.save(productEntity);
                     if (save != null) {
-                        return new ResponseEntity<>(save.getProductId(), HttpStatus.OK);
+                        return new ResponseEntity<>(save.getUuid(), HttpStatus.OK);
                     } else {
                         return new ResponseEntity<>("Product not saved", HttpStatus.BAD_GATEWAY);
                     }

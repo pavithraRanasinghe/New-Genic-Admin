@@ -79,8 +79,11 @@ public class QuestionServiceImpl implements QuestionService {
                     answerEntity.setAnswerTime(DateConverter.localTimeToSql(LocalTime.now()));
                     answerEntity.setQuestionEntity(question.get());
 
+                    question.get().setApprove(true);
+
                     AnswerEntity answerResponse = answerRepository.save(answerEntity);
-                    if (answerResponse != null){
+                    QuestionEntity questionResponse = questionRepository.save(question.get());
+                    if (answerResponse != null && questionResponse != null){
                         return new ResponseEntity<>("Answer successful",HttpStatus.OK);
                     }else {
                         return new ResponseEntity<>("Answer not success",HttpStatus.BAD_REQUEST);

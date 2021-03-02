@@ -43,7 +43,7 @@ public class AdminController {
     @PatchMapping("/update")
     public ResponseEntity<?> updateAdmin(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO,Principal principal){
         LOGGER.info("request - admin | updateAdmin | userUpdateRequestDTO: {} | adminId: {} ",userUpdateRequestDTO,principal.getName());
-        ResponseEntity<?> updateAdmin = adminService.updateAdmin(userUpdateRequestDTO, Long.parseLong(principal.getName()));
+        ResponseEntity<?> updateAdmin = adminService.updateAdmin(userUpdateRequestDTO, principal.getName());
         LOGGER.info("response - admin | updateAdmin | admin: {}",updateAdmin.getBody());
         return updateAdmin;
     }

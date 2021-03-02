@@ -3,7 +3,6 @@ package lk.robot.newgenicadmin.controller;
 import lk.robot.newgenicadmin.dto.request.ProductPriceRequestDTO;
 import lk.robot.newgenicadmin.dto.request.VariationRequestDTO;
 import lk.robot.newgenicadmin.dto.request.BasicProductRequestDTO;
-import lk.robot.newgenicadmin.dto.request.ProductImageRequestDTO;
 import lk.robot.newgenicadmin.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +60,7 @@ public class ProductController {
         return productDetail;
     }
 
-    @DeleteMapping("/variationExit")
+    @DeleteMapping("/variationExit/{productId}")
     public ResponseEntity<?> removeBasicProductDetail(@PathVariable String productId,Principal principal){
         LOGGER.info("request - admin | removeBasicProductDetail | productId: {} | adminId: {}",productId,principal.getName());
         ResponseEntity<?> removeBasicProductDetail = productService.removeBasicProductDetail(productId);

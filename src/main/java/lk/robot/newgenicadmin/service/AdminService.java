@@ -11,5 +11,5 @@ public interface AdminService {
 
     ResponseEntity<?> adminSignIn(AuthenticationRequest authenticationRequest);
 
-    ResponseEntity<?> updateAdmin(UserUpdateRequestDTO userUpdateRequestDTO,long adminId);
+    ResponseEntity<?> updateAdmin(UserUpdateRequestDTO userUpdateRequestDTO,String adminId);
 }

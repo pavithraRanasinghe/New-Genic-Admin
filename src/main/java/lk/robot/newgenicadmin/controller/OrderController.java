@@ -38,7 +38,7 @@ public class OrderController {
         return invoice;
     }
 
-    @PatchMapping("/shipOrder/{orderId}")
+    @PatchMapping("/shipOrder")
     public ResponseEntity<?> shipOrder(@RequestBody ShipOrderRequestDTO shipOrderRequestDTO, Principal principal){
         LOGGER.info("request - admin | shipOrder  | shipOrderRequest: {} | adminId: {}",shipOrderRequestDTO,principal.getName());
         ResponseEntity<?> responseEntity = orderService.shipOrder(shipOrderRequestDTO);
@@ -46,7 +46,7 @@ public class OrderController {
         return responseEntity;
     }
 
-    @PatchMapping("/deliveredOrder")
+    @PatchMapping("/deliveredOrder/{orderId}")
     public ResponseEntity<?> deliveredOrder(@PathVariable String orderId,Principal principal){
         LOGGER.info("request - admin | deliveredOrder | orderId: {} | adminId: {}",orderId,principal.getName());
         ResponseEntity<?> responseEntity = orderService.deliveredOrder(orderId);

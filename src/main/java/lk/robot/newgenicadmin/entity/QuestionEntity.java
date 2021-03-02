@@ -76,8 +76,8 @@ public class QuestionEntity {
         return approve;
     }
 
-    public void setApprove(boolean approve) {
-        approve = approve;
+    public void setApprove(boolean isApprove) {
+        approve = isApprove;
     }
 
 

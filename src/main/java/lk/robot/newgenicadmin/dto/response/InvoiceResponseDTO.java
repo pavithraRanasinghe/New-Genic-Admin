@@ -1,6 +1,5 @@
 package lk.robot.newgenicadmin.dto.response;
 
-import lk.robot.newgenicadmin.dto.ProductDTO;
 import lk.robot.newgenicadmin.dto.UserAddressDTO;
 
 import java.sql.Date;

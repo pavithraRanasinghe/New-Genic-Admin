@@ -1,6 +1,7 @@
 package lk.robot.newgenicadmin.service.impl;
 
 import lk.robot.newgenicadmin.dto.DeliveryCostDTO;
+import lk.robot.newgenicadmin.dto.request.DeliveryCostRequestDTO;
 import lk.robot.newgenicadmin.dto.request.DeliveryRequestDTO;
 import lk.robot.newgenicadmin.dto.response.DeliveryResponseDTO;
 import lk.robot.newgenicadmin.entity.AdminEntity;
@@ -46,15 +47,15 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
-    public ResponseEntity<?> addDelivery(DeliveryRequestDTO deliveryRequestDTO, long adminId) {
+    public ResponseEntity<?> addDelivery(DeliveryRequestDTO deliveryRequestDTO, String adminId) {
         try{
-            Optional<AdminEntity> adminEntity = adminRepository.findById(adminId);
+            Optional<AdminEntity> adminEntity = adminRepository.findByUuid(adminId);
             if (deliveryRequestDTO != null){
                 DeliveryEntity deliveryEntity = deliveryDtoToEntity(deliveryRequestDTO, adminEntity.get());
                 DeliveryEntity delivery = deliveryRepository.save(deliveryEntity);
                 if (!delivery.equals(null)){
-                    for (DeliveryCostDTO deliveryCostDTO :
-                            deliveryRequestDTO.getDeliveryCostDTOList()) {
+                    for (DeliveryCostRequestDTO deliveryCostDTO :
+                            deliveryRequestDTO.getDeliveryCostList()) {
                         DeliveryCostEntity costEntity = modelMapper.map(deliveryCostDTO, DeliveryCostEntity.class);
                         costEntity.setDeliveryEntity(delivery);
 
@@ -109,6 +110,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         deliveryEntity.setRegistrationNumber(deliveryRequestDTO.getRegNo());
         deliveryEntity.setRegistrationDate(DateConverter.localDateToSql(LocalDate.now()));
         deliveryEntity.setRegistrationTime(DateConverter.localTimeToSql(LocalTime.now()));
+        deliveryEntity.setActive(true);
         deliveryEntity.setAdminEntity(adminEntity);
         return deliveryEntity;
     }

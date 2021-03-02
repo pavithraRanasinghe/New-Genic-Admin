@@ -3,6 +3,7 @@ package lk.robot.newgenicadmin.dto.response;
 public class FinanceResponseDTO {
 
     private double orderPrices;
+    private double buyingPrices;
     private double deliveryPrices;
     private double freeDeliveryPrices;
     private double discounts;
@@ -14,6 +15,7 @@ public class FinanceResponseDTO {
     }
 
     public FinanceResponseDTO(double orderPrices,
+                              double buyingPrices,
                               double deliveryPrices,
                               double freeDeliveryPrices,
                               double discounts,
@@ -21,6 +23,7 @@ public class FinanceResponseDTO {
                               double reorder,
                               double profit) {
         this.orderPrices = orderPrices;
+        this.buyingPrices = buyingPrices;
         this.deliveryPrices = deliveryPrices;
         this.freeDeliveryPrices = freeDeliveryPrices;
         this.discounts = discounts;
@@ -35,6 +38,14 @@ public class FinanceResponseDTO {
 
     public void setOrderPrices(double orderPrices) {
         this.orderPrices = orderPrices;
+    }
+
+    public double getBuyingPrices() {
+        return buyingPrices;
+    }
+
+    public void setBuyingPrices(double buyingPrices) {
+        this.buyingPrices = buyingPrices;
     }
 
     public double getDeliveryPrices() {
@@ -89,6 +100,7 @@ public class FinanceResponseDTO {
     public String toString() {
         return "FinanceResponseDTO{" +
                 "orderPrices=" + orderPrices +
+                ", buyingPrices=" + buyingPrices +
                 ", deliveryPrices=" + deliveryPrices +
                 ", freeDeliveryPrices=" + freeDeliveryPrices +
                 ", discounts=" + discounts +

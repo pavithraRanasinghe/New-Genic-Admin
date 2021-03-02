@@ -2,8 +2,6 @@ package lk.robot.newgenicadmin.dto.response;
 
 import lk.robot.newgenicadmin.dto.CombinationDTO;
 
-import java.util.List;
-
 public class ProductResponseDTO {
 
     private String uuid;
@@ -15,7 +13,7 @@ public class ProductResponseDTO {
     private double discount;
     private int qty;
     private double productOrderPrice;
-    private List<CombinationDTO> variationList;
+    private CombinationDTO combinationDTO;
 
     public ProductResponseDTO() {
     }
@@ -29,7 +27,7 @@ public class ProductResponseDTO {
                               double discount,
                               int qty,
                               double productOrderPrice,
-                              List<CombinationDTO> variationList) {
+                              CombinationDTO combinationDTO) {
         this.uuid = uuid;
         this.productCode = productCode;
         this.name = name;
@@ -39,7 +37,7 @@ public class ProductResponseDTO {
         this.discount = discount;
         this.qty = qty;
         this.productOrderPrice = productOrderPrice;
-        this.variationList = variationList;
+        this.combinationDTO = combinationDTO;
     }
 
 
@@ -115,12 +113,12 @@ public class ProductResponseDTO {
         this.productOrderPrice = productOrderPrice;
     }
 
-    public List<CombinationDTO> getVariationList() {
-        return variationList;
+    public CombinationDTO getCombinationDTO() {
+        return combinationDTO;
     }
 
-    public void setVariationList(List<CombinationDTO> variationList) {
-        this.variationList = variationList;
+    public void setCombinationDTO(CombinationDTO combinationDTO) {
+        this.combinationDTO = combinationDTO;
     }
 
     @Override
@@ -135,7 +133,7 @@ public class ProductResponseDTO {
                 ", discount=" + discount +
                 ", qty=" + qty +
                 ", productOrderPrice=" + productOrderPrice +
-                ", variationList=" + variationList +
+                ", combinationDTO=" + combinationDTO +
                 '}';
     }
 }

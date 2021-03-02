@@ -50,11 +50,12 @@ public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
 
             Claims body = claimsJws.getBody();
             String username = body.getSubject();
+            String userId = body.get("id", String.class);
             List<String> authorities = body.get("authorities", List.class);
 
             if(!username.isEmpty()){
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        username,
+                        userId,
                         null,
                         authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
                 );

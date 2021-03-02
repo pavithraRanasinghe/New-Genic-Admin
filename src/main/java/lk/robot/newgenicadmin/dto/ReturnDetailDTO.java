@@ -1,22 +1,24 @@
 package lk.robot.newgenicadmin.dto;
 
+import lk.robot.newgenicadmin.dto.response.ProductResponseDTO;
+
 import java.sql.Date;
 import java.sql.Time;
 
 public class ReturnDetailDTO {
     private String reason;
     private int requestQty;
-    private ProductDTO productDTO;
+    private ProductResponseDTO productResponseDTO;
 
     public ReturnDetailDTO() {
     }
 
     public ReturnDetailDTO(String reason,
                            int requestQty,
-                           ProductDTO productDTO) {
+                           ProductResponseDTO productResponseDTO) {
         this.reason = reason;
         this.requestQty = requestQty;
-        this.productDTO = productDTO;
+        this.productResponseDTO = productResponseDTO;
     }
 
     public String getReason() {
@@ -35,20 +37,20 @@ public class ReturnDetailDTO {
         this.requestQty = requestQty;
     }
 
-    public ProductDTO getProductDTO() {
-        return productDTO;
+    public ProductResponseDTO getProductResponseDTO() {
+        return productResponseDTO;
     }
 
-    public void setProductDTO(ProductDTO productDTO) {
-        this.productDTO = productDTO;
+    public void setProductResponseDTO(ProductResponseDTO productResponseDTO) {
+        this.productResponseDTO = productResponseDTO;
     }
 
     @Override
     public String toString() {
         return "ReturnDetailDTO{" +
-                ", reason='" + reason + '\'' +
+                "reason='" + reason + '\'' +
                 ", requestQty=" + requestQty +
-                ", productDTO=" + productDTO +
+                ", productResponseDTO=" + productResponseDTO +
                 '}';
     }
 }
